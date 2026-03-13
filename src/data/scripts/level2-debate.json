@@ -1,0 +1,277 @@
+{
+  "id": "debate-1",
+  "scenario": "你通过了一家创业公司的面试，HR在微信上跟你谈offer细节。但这位HR似乎在玩一些话术...",
+  "hrName": "李经理",
+  "hrAvatar": "HR",
+  "nodes": [
+    {
+      "id": "node-1",
+      "speaker": "hr",
+      "text": "你好呀～恭喜你通过了我们的面试！大家对你印象都很好。我这边跟你聊一下入职的事情哈～",
+      "nextNodeId": "node-2"
+    },
+    {
+      "id": "node-2",
+      "speaker": "hr",
+      "text": "我们给你的offer是月薪12K，试用期6个月打8折哦，试用期过了就全额发放～你觉得怎么样？",
+      "options": [
+        {
+          "id": "opt-2a",
+          "text": "好的，没问题！谢谢！",
+          "hpDelta": -15,
+          "expDelta": 0,
+          "isCorrect": false,
+          "feedback": "直接接受了不合理的试用期方案。6个月试用期已经是法定最长期限，且80%工资刚好卡法律底线，应当争取更好条件。"
+        },
+        {
+          "id": "opt-2b",
+          "text": "请问试用期6个月是根据什么确定的？合同期限是多久呢？",
+          "hpDelta": 0,
+          "expDelta": 20,
+          "isCorrect": true,
+          "feedback": "问得好！根据《劳动合同法》，3年以上合同试用期才能到6个月。确认合同期限很重要。"
+        },
+        {
+          "id": "opt-2c",
+          "text": "12K有点低了，我期望15K以上。",
+          "hpDelta": -5,
+          "expDelta": 5,
+          "isCorrect": false,
+          "feedback": "谈薪资是好的，但此刻更应该关注试用期的合法性问题。薪资问题可以后面再谈。"
+        }
+      ],
+      "nextNodeId": "node-3"
+    },
+    {
+      "id": "node-3",
+      "speaker": "hr",
+      "text": "嗯...我们合同签1年的，试用期6个月是公司统一规定的～放心，我们公司基本都能转正的！",
+      "options": [
+        {
+          "id": "opt-3a",
+          "text": "1年合同配6个月试用期，这不符合劳动法规定吧？法律规定最多2个月。",
+          "hpDelta": 0,
+          "expDelta": 30,
+          "isCorrect": true,
+          "feedback": "完全正确！1年合同试用期最长2个月。你成功识破了这个违法陷阱。"
+        },
+        {
+          "id": "opt-3b",
+          "text": "好的，1年合同我没意见。",
+          "hpDelta": -20,
+          "expDelta": 0,
+          "isCorrect": false,
+          "feedback": "1年合同配6个月试用期违反《劳动合同法》第19条！正确期限上限为2个月。你被坑了。"
+        },
+        {
+          "id": "opt-3c",
+          "text": "能不能签3年的合同呢？这样更稳定一些。",
+          "hpDelta": -10,
+          "expDelta": 5,
+          "isCorrect": false,
+          "feedback": "虽然想法不错，但你没有抓住关键：1年合同配6个月试用期本身就违法，不能因为HR这么说就接受。"
+        }
+      ],
+      "nextNodeId": "node-4"
+    },
+    {
+      "id": "node-4",
+      "speaker": "hr",
+      "text": "哎呀，你说得对，那我们试用期改成2个月吧！另外跟你说一下，入职后需要交3000块培训费哦，离职时如果干满1年就全退给你～",
+      "options": [
+        {
+          "id": "opt-4a",
+          "text": "入职还要交钱？这不合理吧，劳动法规定用人单位不能以任何名义收取费用。",
+          "hpDelta": 0,
+          "expDelta": 30,
+          "isCorrect": true,
+          "feedback": "正确！《劳动合同法》第9条明确规定，用人单位不得要求劳动者提供担保或以其他名义向劳动者收取财物。"
+        },
+        {
+          "id": "opt-4b",
+          "text": "3000块不多，干满1年能退就行。",
+          "hpDelta": -25,
+          "expDelta": 0,
+          "isCorrect": false,
+          "feedback": "这是典型的入职收费陷阱！不管金额多少、是否承诺退还，入职收费都是违法的。很多公司收了钱就找借口不退。"
+        },
+        {
+          "id": "opt-4c",
+          "text": "能不能从工资里分期扣呢？",
+          "hpDelta": -20,
+          "expDelta": 0,
+          "isCorrect": false,
+          "feedback": "无论以什么形式收取，入职要求交钱都是违法的。从工资扣除更是克扣工资的行为。"
+        }
+      ],
+      "nextNodeId": "node-5"
+    },
+    {
+      "id": "node-5",
+      "speaker": "hr",
+      "text": "好吧好吧，那培训费就不收了～对了，我们公司一般不签劳动合同，签的是劳务协议，效果是一样的，你放心好了～",
+      "options": [
+        {
+          "id": "opt-5a",
+          "text": "劳动合同和劳务协议完全不一样，劳务协议不受劳动法保护，我需要签正式的劳动合同。",
+          "hpDelta": 0,
+          "expDelta": 30,
+          "isCorrect": true,
+          "feedback": "非常专业！劳动合同受《劳动合同法》保护，享受五险一金、加班费等权益。劳务协议是民事合同，不享受这些保护。"
+        },
+        {
+          "id": "opt-5b",
+          "text": "好的，只要有协议就行。",
+          "hpDelta": -25,
+          "expDelta": 0,
+          "isCorrect": false,
+          "feedback": "劳务协议不等于劳动合同！签劳务协议意味着你不是正式员工，不享受五险一金、加班费、经济补偿等劳动法保护。"
+        },
+        {
+          "id": "opt-5c",
+          "text": "为什么不签劳动合同呢？",
+          "hpDelta": -5,
+          "expDelta": 10,
+          "isCorrect": false,
+          "feedback": "虽然提出了疑问，但应该更果断地拒绝。劳务协议是明显的违规操作，不需要追问原因，直接要求签劳动合同即可。"
+        }
+      ],
+      "nextNodeId": "node-6"
+    },
+    {
+      "id": "node-6",
+      "speaker": "hr",
+      "text": "你懂得真多啊！那行，我们签劳动合同。不过有一点，合同上写的基本工资是当地最低工资标准，其他部分以绩效奖金形式发放，这样对你个税也有好处哦～",
+      "options": [
+        {
+          "id": "opt-6a",
+          "text": "这样的话加班费和社保基数都会按最低工资计算，我的权益会受损，请按实际工资签合同。",
+          "hpDelta": 0,
+          "expDelta": 30,
+          "isCorrect": true,
+          "feedback": "洞察力极强！合同工资写低会影响加班费基数、社保公积金基数、经济补偿基数。绩效奖金还可能被随意扣减。"
+        },
+        {
+          "id": "opt-6b",
+          "text": "少交税挺好的，同意！",
+          "hpDelta": -20,
+          "expDelta": 0,
+          "isCorrect": false,
+          "feedback": "表面上少交了税，但你的五险一金基数、加班费计算基数、离职经济补偿都会大幅缩水。长远来看损失更大。"
+        },
+        {
+          "id": "opt-6c",
+          "text": "那个税节省大概多少呢？",
+          "hpDelta": -10,
+          "expDelta": 5,
+          "isCorrect": false,
+          "feedback": "不要被节税话术带偏！关键问题是合同上的工资决定了你所有法定权益的计算基数。"
+        }
+      ],
+      "allowFreeInput": true,
+      "nextNodeId": "node-7"
+    },
+    {
+      "id": "node-7",
+      "speaker": "hr",
+      "text": "还有个事，我们工作节奏会比较紧，加班是常态，公司不太走加班费流程，但会安排调休和晚餐，这样你能接受吧？",
+      "options": [
+        {
+          "id": "opt-7a",
+          "text": "可以加班，但加班费或调休必须按法律执行，并写进公司制度或合同。",
+          "hpDelta": 0,
+          "expDelta": 25,
+          "isCorrect": true,
+          "feedback": "正确！加班需要依法支付加班费或安排调休，不能用“企业文化”替代法定权益。"
+        },
+        {
+          "id": "opt-7b",
+          "text": "可以，只要晚餐管够就行。",
+          "hpDelta": -15,
+          "expDelta": 0,
+          "isCorrect": false,
+          "feedback": "晚餐不是加班补偿。加班费、调休是法定权益，不能被餐补替代。"
+        },
+        {
+          "id": "opt-7c",
+          "text": "那我尽量少加班吧。",
+          "hpDelta": -10,
+          "expDelta": 5,
+          "isCorrect": false,
+          "feedback": "个人意愿无法替代制度问题。关键是明确加班的合法补偿机制。"
+        }
+      ],
+      "nextNodeId": "node-8"
+    },
+    {
+      "id": "node-8",
+      "speaker": "hr",
+      "text": "社保公积金我们一般转正后再缴，试用期先不交，流程更简单～",
+      "options": [
+        {
+          "id": "opt-8a",
+          "text": "社保公积金应当从入职当月缴纳，试用期也必须缴。",
+          "hpDelta": 0,
+          "expDelta": 25,
+          "isCorrect": true,
+          "feedback": "准确！社保、公积金应从入职当月起缴纳，试用期也属于劳动关系。"
+        },
+        {
+          "id": "opt-8b",
+          "text": "没问题，转正后再缴就行。",
+          "hpDelta": -20,
+          "expDelta": 0,
+          "isCorrect": false,
+          "feedback": "试用期不缴社保属于违法行为，会导致你的医疗、工伤等权益缺失。"
+        },
+        {
+          "id": "opt-8c",
+          "text": "不交也行，那试用期给我一点补贴吧。",
+          "hpDelta": -10,
+          "expDelta": 5,
+          "isCorrect": false,
+          "feedback": "补贴不能替代社保权益。关键是依法缴纳而不是谈“补偿”。"
+        }
+      ],
+      "nextNodeId": "node-9"
+    },
+    {
+      "id": "node-9",
+      "speaker": "hr",
+      "text": "为了流程快，我们先让第三方人力公司代签合同并发工资，工作还是在我们这边，你看行吗？",
+      "options": [
+        {
+          "id": "opt-9a",
+          "text": "我需要与实际用工单位签劳动合同，并确认社保、公积金由其缴纳。",
+          "hpDelta": 0,
+          "expDelta": 25,
+          "isCorrect": true,
+          "feedback": "正确！实际用工单位应与劳动者建立劳动关系，外包/代签可能导致权益难保障。"
+        },
+        {
+          "id": "opt-9b",
+          "text": "可以，只要工资按时发就行。",
+          "hpDelta": -20,
+          "expDelta": 0,
+          "isCorrect": false,
+          "feedback": "代签合同可能让劳动关系不清晰，发生争议时很难维权。"
+        },
+        {
+          "id": "opt-9c",
+          "text": "是哪家第三方？规模大就可以。",
+          "hpDelta": -10,
+          "expDelta": 5,
+          "isCorrect": false,
+          "feedback": "公司规模不是核心问题，关键是劳动关系主体与权益保障。"
+        }
+      ],
+      "nextNodeId": "node-10"
+    },
+    {
+      "id": "node-10",
+      "speaker": "hr",
+      "text": "你真的很专业！好，我们都按正规流程来，期待与你合作！",
+      "nextNodeId": null
+    }
+  ]
+}

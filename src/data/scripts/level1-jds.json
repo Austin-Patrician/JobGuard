@@ -1,0 +1,191 @@
+[
+  {
+    "id": "jd-1",
+    "company": "星辰未来科技有限公司",
+    "position": "运营专员",
+    "salary": "8K-15K",
+    "fullText": "【星辰未来科技】招聘运营专员\n\n薪资：8K-15K（能力优秀者可面议上浮）\n\n岗位职责：\n1. 负责公司新媒体账号的日常运营维护\n2. 协助完成领导安排的其他工作\n3. 独立策划并执行线上线下活动\n4. 定期输出运营数据报告\n\n任职要求：\n1. 本科及以上学历，专业不限\n2. 能接受偶尔加班，弹性工作制\n3. 具备良好的沟通能力和抗压能力\n4. 有短视频运营经验者优先\n\n福利待遇：\n- 试用期薪资为正式薪资的80%，表现优秀可提前转正\n- 六险一金（补充商业保险）\n- 每年一次调薪机会\n- 丰富的团建活动",
+    "traps": [
+      {
+        "id": "jd1-trap1",
+        "text": "能力优秀者可面议上浮",
+        "startIndex": 31,
+        "endIndex": 42,
+        "category": "salary",
+        "severity": "medium",
+        "explanation": "薪资范围模糊，'面议上浮'是典型话术，实际入职往往按最低标准发放。建议要求明确薪资数字。"
+      },
+      {
+        "id": "jd1-trap2",
+        "text": "协助完成领导安排的其他工作",
+        "startIndex": 92,
+        "endIndex": 104,
+        "category": "responsibility",
+        "severity": "high",
+        "explanation": "'其他工作'是万能条款，入职后可能被安排大量职责外的杂活，却无法拒绝。"
+      },
+      {
+        "id": "jd1-trap3",
+        "text": "能接受偶尔加班，弹性工作制",
+        "startIndex": 177,
+        "endIndex": 190,
+        "category": "overtime",
+        "severity": "high",
+        "explanation": "'偶尔加班'+'弹性工作制'组合常意味着长期加班且不计加班费。弹性工作制可能变成'弹性延长工作时间'。"
+      },
+      {
+        "id": "jd1-trap4",
+        "text": "抗压能力",
+        "startIndex": 206,
+        "endIndex": 210,
+        "category": "vague",
+        "severity": "medium",
+        "explanation": "'抗压能力'是高频红旗词，常暗示工作强度大、加班多、管理混乱，需要员工默默承受。"
+      },
+      {
+        "id": "jd1-trap5",
+        "text": "试用期薪资为正式薪资的80%，表现优秀可提前转正",
+        "startIndex": 244,
+        "endIndex": 266,
+        "category": "salary",
+        "severity": "high",
+        "explanation": "根据《劳动合同法》第20条，试用期工资不得低于约定工资的80%，这里刚好卡在法律底线。且'表现优秀可提前转正'暗示可能会延长试用期。"
+      }
+    ]
+  },
+  {
+    "id": "jd-2",
+    "company": "鸿运达集团",
+    "position": "销售经理",
+    "salary": "5K底薪+高提成",
+    "fullText": "【鸿运达集团】急招销售经理 月入过万不是梦！\n\n薪资结构：5K底薪+高提成（上不封顶！）\n\n我们需要你：\n1. 开拓新客户资源，维护老客户关系\n2. 完成每月销售指标\n3. 入职即享全面系统培训\n4. 适应短期出差（费用公司承担）\n\n要求：\n1. 年龄22-30岁，形象气质佳\n2. 有无经验均可，公司提供培训\n3. 自备交通工具优先\n4. 认同公司狼性文化\n\n我们给你：\n- 无责底薪5000元\n- 提成比例10%-50%（根据业绩阶梯递增）\n- 每季度团队旅游\n- 股权激励计划（核心员工）\n- 入职缴纳五险",
+    "traps": [
+      {
+        "id": "jd2-trap1",
+        "text": "月入过万不是梦",
+        "startIndex": 18,
+        "endIndex": 26,
+        "category": "salary",
+        "severity": "medium",
+        "explanation": "用'不是梦'等煽动性语言描述薪资，回避实际收入水平。实际上大部分销售很难达到宣传的收入。"
+      },
+      {
+        "id": "jd2-trap2",
+        "text": "上不封顶",
+        "startIndex": 48,
+        "endIndex": 52,
+        "category": "salary",
+        "severity": "medium",
+        "explanation": "'上不封顶'是销售岗经典话术，需关注底薪是否足够，提成规则是否透明。"
+      },
+      {
+        "id": "jd2-trap3",
+        "text": "年龄22-30岁，形象气质佳",
+        "startIndex": 137,
+        "endIndex": 151,
+        "category": "vague",
+        "severity": "high",
+        "explanation": "年龄限制和外貌要求涉嫌就业歧视，违反《就业促进法》。此类公司可能存在其他合规问题。"
+      },
+      {
+        "id": "jd2-trap4",
+        "text": "自备交通工具优先",
+        "startIndex": 170,
+        "endIndex": 178,
+        "category": "benefit",
+        "severity": "medium",
+        "explanation": "要求自备交通工具，意味着出差/外出拜访的交通成本可能由个人承担。"
+      },
+      {
+        "id": "jd2-trap5",
+        "text": "认同公司狼性文化",
+        "startIndex": 180,
+        "endIndex": 188,
+        "category": "overtime",
+        "severity": "high",
+        "explanation": "'狼性文化'几乎等于强制加班+高压管理+末位淘汰。这类公司通常工作生活平衡极差。"
+      },
+      {
+        "id": "jd2-trap6",
+        "text": "入职缴纳五险",
+        "startIndex": 264,
+        "endIndex": 270,
+        "category": "benefit",
+        "severity": "high",
+        "explanation": "只提'五险'没有'一金'（住房公积金）。虽然公积金非强制，但正规公司一般都会缴纳，缺失公积金是福利缩水的信号。"
+      }
+    ]
+  },
+  {
+    "id": "jd-3",
+    "company": "创梦互娱科技",
+    "position": "产品经理",
+    "salary": "15K-25K",
+    "fullText": "【创梦互娱】产品经理 / 薪资15K-25K / 大小周\n\n关于我们：\n创梦互娱是一家处于高速发展期的互联网公司，团队年轻有活力。\n\n岗位职责：\n1. 负责公司核心产品的规划和设计\n2. 跟进产品开发全流程，协调技术、设计、运营等多部门\n3. 需要有owner意识，主动推进项目进度\n4. 具备数据分析能力，持续优化产品体验\n\n任职要求：\n1. 本科及以上学历，3年以上产品经验\n2. 熟练使用Axure、Figma等原型工具\n3. 能承受高强度工作节奏\n4. 有教育/社交产品经验者优先\n\n薪资福利：\n- 大小周工作制，大周六天补贴200元/天\n- 15薪（13薪+2薪绩效奖金）\n- 带薪年假5天\n- 每日下午茶、零食供应\n- 扁平化管理，直接向CEO汇报",
+    "traps": [
+      {
+        "id": "jd3-trap1",
+        "text": "大小周",
+        "startIndex": 30,
+        "endIndex": 33,
+        "category": "overtime",
+        "severity": "high",
+        "explanation": "大小周意味着每两周需要工作6天，年均加班约26天。虽然标注了补贴，但200元/天远低于法定加班工资标准。"
+      },
+      {
+        "id": "jd3-trap2",
+        "text": "处于高速发展期",
+        "startIndex": 48,
+        "endIndex": 55,
+        "category": "vague",
+        "severity": "low",
+        "explanation": "'高速发展期'常用于美化公司制度不完善、流程混乱的现状，也可能意味着频繁加班赶进度。"
+      },
+      {
+        "id": "jd3-trap3",
+        "text": "owner意识",
+        "startIndex": 133,
+        "endIndex": 140,
+        "category": "responsibility",
+        "severity": "medium",
+        "explanation": "'owner意识'是职场PUA用语，暗示你需要像老板一样操心，却只拿员工的薪水。常用于合理化额外工作量。"
+      },
+      {
+        "id": "jd3-trap4",
+        "text": "能承受高强度工作节奏",
+        "startIndex": 211,
+        "endIndex": 221,
+        "category": "overtime",
+        "severity": "high",
+        "explanation": "直接说明工作强度大，结合大小周，实际工作时长可能远超法定标准。"
+      },
+      {
+        "id": "jd3-trap5",
+        "text": "大周六天补贴200元/天",
+        "startIndex": 258,
+        "endIndex": 272,
+        "category": "salary",
+        "severity": "high",
+        "explanation": "按月薪15K算，日薪约680元，周末加班法定应付2倍即1360元。200元补贴仅为法定标准的14.7%，严重低于法律规定。"
+      },
+      {
+        "id": "jd3-trap6",
+        "text": "15薪（13薪+2薪绩效奖金）",
+        "startIndex": 274,
+        "endIndex": 289,
+        "category": "salary",
+        "severity": "medium",
+        "explanation": "2个月薪资标注为'绩效奖金'，意味着不保证发放。绩效标准由公司定义，可能成为克扣工资的手段。"
+      },
+      {
+        "id": "jd3-trap7",
+        "text": "带薪年假5天",
+        "startIndex": 291,
+        "endIndex": 297,
+        "category": "benefit",
+        "severity": "low",
+        "explanation": "5天是《职工带薪年休假条例》规定的最低标准（工作满1年）。如果要求3年经验却只给最低年假，说明公司对员工福利投入较少。"
+      }
+    ]
+  }
+]
