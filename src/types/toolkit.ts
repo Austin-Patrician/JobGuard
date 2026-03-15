@@ -45,7 +45,7 @@ export interface ContractResult {
 }
 
 // Analysis history record
-export interface AnalysisRecord {
+interface AnalysisRecordBase {
   id: string;
   tool: ToolkitTool;
   timestamp: number;
@@ -54,6 +54,16 @@ export interface AnalysisRecord {
   score: number;
   summary: string;
 }
+
+export type AnalysisRecord =
+  | (AnalysisRecordBase & {
+      tool: "mirror";
+      result: MirrorResult;
+    })
+  | (AnalysisRecordBase & {
+      tool: "contract";
+      result: ContractResult;
+    });
 
 // Store types
 export interface ToolkitState {

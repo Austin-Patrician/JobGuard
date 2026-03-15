@@ -33,8 +33,10 @@ export default function ReportFeed() {
 
       const res = await fetch(`${API_ROUTES.COMMUNITY.REPORTS}?${params}`);
       const data = await res.json();
-      setReports((prev) => (append ? [...prev, ...data.items] : data.items));
-      setTotal(data.total);
+      const items = Array.isArray(data?.items) ? data.items : [];
+      const nextTotal = typeof data?.total === "number" ? data.total : items.length;
+      setReports((prev) => (append ? [...prev, ...items] : items));
+      setTotal(nextTotal);
     } catch {
       // silently fail
     } finally {

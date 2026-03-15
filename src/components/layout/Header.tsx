@@ -10,28 +10,35 @@ export function Header() {
           </Link>
           <nav className="flex items-center gap-6">
             <Link
-              href="/game"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
-            >
-              Game
-            </Link>
-            <Link
               href="/dashboard"
               className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
             >
-              Dashboard
+              总览
             </Link>
+            <Link
+              href="/game"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+            >
+              闯关
+            </Link>
+            <Link
+              href="/toolkit"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+            >
+              工具箱
+            </Link>
+            <Link
+              href="/law-chat"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+            >
+              劳动法咨询
+            </Link>
+            
             <Link
               href="/community"
               className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
             >
               情报局
-            </Link>
-            <Link
-              href="/login"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
-            >
-              Login
             </Link>
           </nav>
         </div>

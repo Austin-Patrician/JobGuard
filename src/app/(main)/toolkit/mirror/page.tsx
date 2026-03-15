@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import clsx from "clsx";
 import InputModeSwitch from "@/components/toolkit/InputModeSwitch";
@@ -60,6 +61,10 @@ export default function MirrorPage() {
   const result = useToolkitStore((s) => s.currentMirrorResult);
   const setMirrorResult = useToolkitStore((s) => s.setMirrorResult);
   const addHistory = useToolkitStore((s) => s.addHistory);
+  const history = useToolkitStore((s) => s.history);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const historyId = searchParams.get("historyId");
   const abortRef = useRef<AbortController | null>(null);
 
   const canSubmit =
@@ -76,7 +81,27 @@ export default function MirrorPage() {
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
+  useEffect(() => {
+    if (!historyId) return;
+    const record = history.find(
+      (item) => item.id === historyId && item.tool === "mirror"
+    );
+    const recordResult = (record as { result?: MirrorResult } | undefined)?.result;
+    if (recordResult) {
+      setMirrorResult(recordResult);
+      setPhase("results");
+      setStreamedText("");
+      setError(null);
+    } else {
+      setMirrorResult(null);
+      setPhase("input");
+    }
+  }, [historyId, history, setMirrorResult]);
+
   const handleSubmit = useCallback(async () => {
+    if (historyId) {
+      router.replace("/toolkit/mirror");
+    }
     setError(null);
     setStreamedText("");
     setMirrorResult(null);
@@ -140,6 +165,7 @@ export default function MirrorPage() {
           riskLevel: finalResult.riskLevel,
           score: finalResult.overallScore,
           summary: finalResult.summary,
+          result: finalResult,
         });
         setPhase("results");
       } else {
@@ -157,14 +183,17 @@ export default function MirrorPage() {
       clearTimeout(timeout);
       abortRef.current = null;
     }
-  }, [mode, text, previews, setMirrorResult, addHistory]);
+  }, [mode, text, previews, setMirrorResult, addHistory, historyId, router]);
 
   const handleReset = useCallback(() => {
     setPhase("input");
     setMirrorResult(null);
     setStreamedText("");
     setError(null);
-  }, [setMirrorResult]);
+    if (historyId) {
+      router.replace("/toolkit/mirror");
+    }
+  }, [setMirrorResult, historyId, router]);
 
   return (
     <div

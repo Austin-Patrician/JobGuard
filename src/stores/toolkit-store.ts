@@ -30,6 +30,10 @@ export const useToolkitStore = create<ToolkitState & ToolkitActions>()(
       partialize: (state) => ({
         history: state.history,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        state.history = state.history.filter((record: any) => !!record?.result);
+      },
     }
   )
 );

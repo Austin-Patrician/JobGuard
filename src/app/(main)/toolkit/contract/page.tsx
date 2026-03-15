@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import clsx from "clsx";
 import InputModeSwitch from "@/components/toolkit/InputModeSwitch";
@@ -61,6 +62,10 @@ export default function ContractPage() {
   const result = useToolkitStore((s) => s.currentContractResult);
   const setContractResult = useToolkitStore((s) => s.setContractResult);
   const addHistory = useToolkitStore((s) => s.addHistory);
+  const history = useToolkitStore((s) => s.history);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const historyId = searchParams.get("historyId");
   const abortRef = useRef<AbortController | null>(null);
 
   const canSubmit =
@@ -77,7 +82,27 @@ export default function ContractPage() {
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
+  useEffect(() => {
+    if (!historyId) return;
+    const record = history.find(
+      (item) => item.id === historyId && item.tool === "contract"
+    );
+    const recordResult = (record as { result?: ContractResult } | undefined)?.result;
+    if (recordResult) {
+      setContractResult(recordResult);
+      setPhase("results");
+      setStreamedText("");
+      setError(null);
+    } else {
+      setContractResult(null);
+      setPhase("input");
+    }
+  }, [historyId, history, setContractResult]);
+
   const handleSubmit = useCallback(async () => {
+    if (historyId) {
+      router.replace("/toolkit/contract");
+    }
     setError(null);
     setStreamedText("");
     setContractResult(null);
@@ -138,6 +163,7 @@ export default function ContractPage() {
           riskLevel: finalResult.riskLevel,
           score: finalResult.overallScore,
           summary: finalResult.legalAdvice,
+          result: finalResult,
         });
         setPhase("results");
       } else {
@@ -154,14 +180,26 @@ export default function ContractPage() {
       clearTimeout(timeout);
       abortRef.current = null;
     }
-  }, [mode, text, previews, files.length, setContractResult, addHistory]);
+  }, [
+    mode,
+    text,
+    previews,
+    files.length,
+    setContractResult,
+    addHistory,
+    historyId,
+    router,
+  ]);
 
   const handleReset = useCallback(() => {
     setPhase("input");
     setContractResult(null);
     setStreamedText("");
     setError(null);
-  }, [setContractResult]);
+    if (historyId) {
+      router.replace("/toolkit/contract");
+    }
+  }, [setContractResult, historyId, router]);
 
   const highCount = result?.riskItems.filter((i) => i.severity === "high").length ?? 0;
   const mediumCount = result?.riskItems.filter((i) => i.severity === "medium").length ?? 0;
@@ -299,15 +337,15 @@ export default function ContractPage() {
               key="results"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-10 grid gap-8 lg:grid-cols-[1fr_0.6fr]"
+              className="mt-10 grid min-w-0 gap-8 lg:grid-cols-[1fr_0.6fr]"
             >
-              <div className="space-y-6">
+              <div className="min-w-0 space-y-6">
                 {result && (
                   <>
                     <motion.div
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="glass-panel rounded-3xl p-6 text-[color:var(--ink)]"
+                      className="glass-panel min-w-0 rounded-3xl p-6 text-[color:var(--ink)]"
                     >
                       <div className="flex items-start justify-between">
                         <div>
@@ -333,7 +371,7 @@ export default function ContractPage() {
                     </motion.div>
 
                     {result.riskItems.length > 0 && (
-                      <div className="glass-panel rounded-3xl p-6 text-[color:var(--ink)]">
+                      <div className="glass-panel min-w-0 rounded-3xl p-6 text-[color:var(--ink)]">
                         <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--muted-ink)]">
                           风险条款
                         </p>
@@ -349,7 +387,7 @@ export default function ContractPage() {
                 )}
 
                 {!result && streamedText && (
-                  <div className="glass-panel rounded-3xl p-6 text-[color:var(--ink)]">
+                  <div className="glass-panel min-w-0 rounded-3xl p-6 text-[color:var(--ink)]">
                     <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--muted-ink)]">
                       分析结果（原始输出）
                     </p>
@@ -363,14 +401,14 @@ export default function ContractPage() {
                 )}
               </div>
 
-              <div className="space-y-4">
+              <div className="min-w-0 space-y-4">
                 {result && (
                   <>
                     <motion.div
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.15 }}
-                      className="glass-panel rounded-3xl p-6 text-center text-[color:var(--ink)]"
+                      className="glass-panel min-w-0 rounded-3xl p-6 text-center text-[color:var(--ink)]"
                     >
                       <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--muted-ink)]">
                         安全评分
@@ -421,7 +459,7 @@ export default function ContractPage() {
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
-                      className="glass-panel rounded-3xl p-6 text-[color:var(--ink)]"
+                      className="glass-panel min-w-0 rounded-3xl p-6 text-[color:var(--ink)]"
                     >
                       <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--muted-ink)]">
                         综合法律建议

@@ -58,15 +58,30 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const parseDataUrl = (value: string) => {
+      const match = value.match(/^data:([^;]+);base64,(.+)$/);
+      if (!match) return null;
+      return { mediaType: match[1], data: match[2] };
+    };
+
     const userContent =
       mode === "text"
         ? [{ type: "text" as const, text: `请分析以下劳动合同内容：\n\n${text}` }]
         : [
             { type: "text" as const, text: `请分析以下劳动合同图片（共${imagesBase64!.length}页）：` },
-            ...imagesBase64!.map((img) => ({
-              type: "image" as const,
-              image: img,
-            })),
+            ...imagesBase64!.map((img) => {
+              const parsed = parseDataUrl(img);
+              return parsed
+                ? {
+                    type: "image" as const,
+                    image: parsed.data,
+                    mediaType: parsed.mediaType,
+                  }
+                : {
+                    type: "image" as const,
+                    image: img,
+                  };
+            }),
           ];
 
     const result = streamText({

@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { API_ROUTES } from "@/lib/constants";
-import ChinaHeatmap from "@/components/community/ChinaHeatmap";
 import TagCloud from "@/components/community/TagCloud";
 import StatsBar from "@/components/community/StatsBar";
 import ReportFeed from "@/components/community/ReportFeed";
+import MapLegend from "@/components/community/MapLegend";
 import type { CommunityStats } from "@/types/community";
+
+const ChinaMap = dynamic(() => import("@/components/community/ChinaMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full animate-pulse bg-[color:var(--paper)] opacity-40 rounded-2xl" />
+  ),
+});
 
 export default function CommunityPage() {
   const [stats, setStats] = useState<CommunityStats | null>(null);
@@ -20,14 +28,13 @@ export default function CommunityPage() {
       .catch(() => {});
   }, []);
 
-  const topScamType =
-    stats?.top_tags?.[0]?.tag ?? null;
+  const topScamType = stats?.top_tags?.[0]?.tag ?? null;
 
   return (
     <div className="min-h-screen intel-surface text-[color:var(--ink)]">
       <div className="pointer-events-none absolute inset-0 grain-overlay opacity-20" />
 
-      {/* Header */}
+      {/* Header: Title + Stats */}
       <section className="relative mx-auto max-w-6xl px-4 pt-12 pb-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -61,55 +68,61 @@ export default function CommunityPage() {
         />
       </section>
 
-      {/* Heatmap + Tags — two-column on desktop */}
-      <section className="relative mx-auto max-w-6xl px-4 pb-10">
-        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="paper-card p-5"
-          >
+      {/* Tags + Industries */}
+      <section className="relative mx-auto max-w-6xl px-4 pb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="grid gap-6 sm:grid-cols-2"
+        >
+          <div className="paper-card p-5">
             <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[color:var(--muted-ink)]">
-              全国热力图
+              骗术标签
             </p>
-            <ChinaHeatmap regions={stats?.regions ?? []} />
-          </motion.div>
+            <TagCloud tags={stats?.top_tags ?? []} />
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="space-y-6"
-          >
+          {stats?.top_industries && stats.top_industries.length > 0 && (
             <div className="paper-card p-5">
               <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[color:var(--muted-ink)]">
-                骗术标签
+                高发行业
               </p>
-              <TagCloud tags={stats?.top_tags ?? []} />
-            </div>
-
-            {stats?.top_industries && stats.top_industries.length > 0 && (
-              <div className="paper-card p-5">
-                <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[color:var(--muted-ink)]">
-                  高发行业
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {stats.top_industries.map(({ industry, count }) => (
-                    <span key={industry} className="tag-chip">
-                      {industry}
-                      <span className="ml-1 opacity-60">{count}</span>
-                    </span>
-                  ))}
-                </div>
+              <div className="flex flex-wrap gap-2">
+                {stats.top_industries.map(({ industry, count }) => (
+                  <span key={industry} className="tag-chip">
+                    {industry}
+                    <span className="ml-1 opacity-60">{count}</span>
+                  </span>
+                ))}
               </div>
-            )}
-          </motion.div>
-        </div>
+            </div>
+          )}
+        </motion.div>
       </section>
 
+      {/* Map */}
+      <section className="relative mx-auto max-w-6xl px-4 pb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="paper-card relative overflow-hidden h-[520px]"
+        >
+          <ChinaMap regions={stats?.regions ?? []} />
+          <div className="absolute bottom-3 right-3 z-10">
+            <MapLegend />
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Divider */}
+      <div className="mx-auto max-w-6xl px-4">
+        <div className="h-px bg-[color:var(--paper-edge)]" />
+      </div>
+
       {/* Feed */}
-      <section className="relative mx-auto max-w-6xl px-4 pb-16">
+      <section className="relative mx-auto max-w-6xl px-4 pt-10 pb-16">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

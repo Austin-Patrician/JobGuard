@@ -67,128 +67,64 @@ export default function DashboardPage() {
         </section>
       </div>
 
-      <section className="mx-auto max-w-6xl px-4 pb-6">
-        <div className="grid gap-6 lg:grid-cols-3">
+      <section id="modules" className="mx-auto max-w-6xl px-4 pb-16">
+        <div className="grid gap-4 sm:grid-cols-3">
           {[
             {
-              title: "扫描识别",
-              desc: "在 JD 中找出“漂亮话”的真实含义。",
+              num: "01",
+              title: "剧情闯关",
+              desc: "三关联动：JD 识别 → HR 对线 → 合同排雷。按顺序解锁。",
+              status: "开放中",
+              chips: ["黄金眼", "唇枪舌战", "合同迷宫"],
+              href: "/game",
+              cta: "开始闯关",
             },
             {
-              title: "对线反驳",
-              desc: "面对 HR 话术，稳住立场并反问关键点。",
+              num: "02",
+              title: "实用工具箱",
+              desc: "粘贴 JD 或聊天记录，AI 给出红绿灯评级与话术翻译。",
+              status: "已开放",
+              chips: ["照妖镜", "合同避雷针", "红绿灯评级"],
+              href: "/toolkit",
+              cta: "进入工具箱",
             },
             {
-              title: "合同排雷",
-              desc: "在长文本里捕捉隐性条款与违约陷阱。",
+              num: "03",
+              title: "避坑情报局",
+              desc: "匿名经验汇总，AI 脱敏归纳骗术，生成热力图与标签。",
+              status: "已开放",
+              chips: ["匿名投稿", "热力地图", "骗术标签"],
+              href: "/community",
+              cta: "进入情报局",
             },
-          ].map((item) => (
-            <div key={item.title} className="story-card px-5 py-4">
-              <p className="text-xs uppercase tracking-[0.26em] text-[color:var(--muted-ink)]">
-                Step
+          ].map((mod) => (
+            <a
+              key={mod.num}
+              href={mod.href}
+              className="paper-card flex flex-col p-5 transition hover:-translate-y-0.5"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--muted-ink)]">
+                  {mod.num}
+                </span>
+                <span className="story-chip">{mod.status}</span>
+              </div>
+              <h3 className="mt-2 font-display text-2xl">{mod.title}</h3>
+              <p className="mt-1 text-xs leading-relaxed text-[color:var(--muted-ink)]">
+                {mod.desc}
               </p>
-              <h3 className="mt-2 font-display text-2xl">{item.title}</h3>
-              <p className="mt-2 text-sm text-[color:var(--muted-ink)]">
-                {item.desc}
-              </p>
-            </div>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {mod.chips.map((chip) => (
+                  <span key={chip} className="boss-chip">
+                    {chip}
+                  </span>
+                ))}
+              </div>
+              <span className="mt-auto pt-4 text-xs font-semibold text-[color:var(--accent)]">
+                {mod.cta} &rarr;
+              </span>
+            </a>
           ))}
-        </div>
-      </section>
-
-      <section id="modules" className="mx-auto max-w-6xl px-4 pb-12">
-        <div className="relative">
-          <div className="absolute left-3 top-0 hidden h-full w-px story-line sm:block" />
-          <div className="space-y-8">
-            {[
-              {
-                label: "模块一",
-                title: "剧情闯关",
-                desc: "三关联动推进：JD 识别 → HR 对线 → 合同排雷。按顺序解锁。",
-                status: "开放中",
-                chips: ["黄金眼", "唇枪舌战", "合同迷宫"],
-              },
-              {
-                label: "模块二",
-                title: "实用工具箱",
-                desc: "粘贴 JD 或聊天记录，AI 自动给出红绿灯评级与话术翻译。",
-                status: "已开放",
-                chips: ["照妖镜", "合同避雷针", "红绿灯评级"],
-                href: "/toolkit",
-              },
-              {
-                label: "模块三",
-                title: "避坑情报局",
-                desc: "匿名经验汇总，AI 脱敏归纳骗术，生成行业热力与标签。",
-                status: "已开放",
-                chips: ["匿名投稿", "热力地图", "骗术标签"],
-                href: "/community",
-              },
-            ].map((mod, index) => {
-              const inner = (
-                <div className="paper-card p-6">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted-ink)]">
-                        {mod.label}
-                      </p>
-                      <h3 className="mt-2 font-display text-3xl">
-                        {mod.title}
-                      </h3>
-                    </div>
-                    <span className="story-chip">{mod.status}</span>
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted-ink)]">
-                    {mod.desc}
-                  </p>
-                  <div className="mt-4 flex flex-wrap items-center gap-2">
-                    {mod.chips.map((chip) => (
-                      <span key={chip} className="boss-chip">
-                        {chip}
-                      </span>
-                    ))}
-                    {index === 2 && mod.href && (
-                      <span className="boss-chip">进入情报局 &rarr;</span>
-                    )}
-                  </div>
-                </div>
-              );
-              return (
-                <div key={mod.label} className="relative sm:pl-10">
-                  <div className="hidden sm:block absolute left-0 top-7 h-3 w-3 rounded-full border border-black/20 bg-white" />
-                  {"href" in mod && mod.href ? (
-                    <a href={mod.href} className="block transition hover:-translate-y-0.5">
-                      {inner}
-                    </a>
-                  ) : (
-                    inner
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 pb-16">
-        <div className="story-card flex flex-col items-start gap-4 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted-ink)]">
-              进入剧情
-            </p>
-            <h3 className="mt-2 font-display text-2xl">
-              从第一关开始，逐步解锁
-            </h3>
-            <p className="mt-2 text-sm text-[color:var(--muted-ink)]">
-              每一步都在训练你的判断力。
-            </p>
-          </div>
-          <a
-            href="/game"
-            className="rounded-full bg-[color:var(--accent)] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(179,43,43,0.25)] transition hover:-translate-y-0.5"
-          >
-            开始闯关
-          </a>
         </div>
       </section>
     </div>

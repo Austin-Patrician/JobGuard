@@ -56,12 +56,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const parseDataUrl = (value: string) => {
+      const match = value.match(/^data:([^;]+);base64,(.+)$/);
+      if (!match) return null;
+      return { mediaType: match[1], data: match[2] };
+    };
+
     const userContent =
       mode === "text"
         ? [{ type: "text" as const, text: text! }]
         : [
             { type: "text" as const, text: "请分析以下招聘截图中的内容：" },
-            { type: "image" as const, image: imageBase64! },
+            (() => {
+              const parsed = parseDataUrl(imageBase64!);
+              return parsed
+                ? {
+                    type: "image" as const,
+                    image: parsed.data,
+                    mediaType: parsed.mediaType,
+                  }
+                : { type: "image" as const, image: imageBase64! };
+            })(),
           ];
 
     const result = streamText({

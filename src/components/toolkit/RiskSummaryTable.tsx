@@ -95,7 +95,7 @@ export default function RiskSummaryTable({ items }: RiskSummaryTableProps) {
                       <p className="text-[11px] uppercase tracking-[0.2em] text-[color:var(--muted-ink)]">
                         法律依据
                       </p>
-                      <p className="mt-1 text-xs text-[color:var(--ink)]">
+                      <p className="mt-1 break-words text-xs text-[color:var(--ink)]">
                         {item.legalBasis}
                       </p>
                     </div>
@@ -103,7 +103,7 @@ export default function RiskSummaryTable({ items }: RiskSummaryTableProps) {
                       <p className="text-[11px] uppercase tracking-[0.2em] text-[color:var(--muted-ink)]">
                         风险解释
                       </p>
-                      <p className="mt-1 text-xs text-[color:var(--ink)]">
+                      <p className="mt-1 break-words text-xs text-[color:var(--ink)]">
                         {item.explanation}
                       </p>
                     </div>
@@ -111,7 +111,7 @@ export default function RiskSummaryTable({ items }: RiskSummaryTableProps) {
                       <p className="text-[11px] uppercase tracking-[0.2em] text-[color:var(--muted-ink)]">
                         修改建议
                       </p>
-                      <p className="mt-1 text-xs text-[color:var(--success)]">
+                      <p className="mt-1 break-words text-xs text-[color:var(--success)]">
                         {item.suggestion}
                       </p>
                     </div>
