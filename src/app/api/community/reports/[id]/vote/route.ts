@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { getSupabaseServiceClient } from "@/lib/supabase/server";
+import { getDbPool } from "@/lib/db";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { COMMUNITY_CONFIG } from "@/lib/constants";
+import { COMMUNITY_CONFIG, BODY_SIZE_LIMITS } from "@/lib/constants";
+import { parseJsonBody } from "@/lib/request-guard";
 
 export async function POST(
   request: NextRequest,
@@ -10,8 +10,9 @@ export async function POST(
 ) {
   try {
     const { id: reportId } = await params;
-    const body = await request.json();
-    const { visitor_id } = body as { visitor_id?: string };
+    const parsed = await parseJsonBody<{ visitor_id?: string }>(request, BODY_SIZE_LIMITS.COMMUNITY_VOTE);
+    if (!parsed.ok) return parsed.response;
+    const { visitor_id } = parsed.data;
 
     if (!visitor_id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(visitor_id)) {
       return NextResponse.json(
@@ -28,47 +29,54 @@ export async function POST(
       );
     }
 
-    // Verify report exists and is approved
-    const supabase = getSupabaseServerClient();
-    const { data: report } = await supabase
-      .from("community_reports")
-      .select("id, upvotes")
-      .eq("id", reportId)
-      .eq("status", "approved")
-      .single();
+    const pool = getDbPool();
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
 
-    if (!report) {
-      return NextResponse.json({ error: "Report not found" }, { status: 404 });
-    }
-
-    // Insert vote (UNIQUE constraint prevents duplicates)
-    const { error: voteError } = await supabase
-      .from("community_votes")
-      .insert({ report_id: reportId, visitor_id });
-
-    if (voteError) {
-      if (voteError.code === "23505") {
-        return NextResponse.json(
-          { success: false, error: "ALREADY_VOTED", upvotes: report.upvotes },
-          { status: 409 }
-        );
+      const reportRes = await client.query<{ id: string; upvotes: number }>(
+        "SELECT id, upvotes FROM community_reports WHERE id = $1 AND status = 'approved' FOR UPDATE",
+        [reportId]
+      );
+      const report = reportRes.rows[0];
+      if (!report) {
+        await client.query("ROLLBACK");
+        return NextResponse.json({ error: "Report not found" }, { status: 404 });
       }
-      throw voteError;
+
+      try {
+        await client.query(
+          "INSERT INTO community_votes (report_id, visitor_id) VALUES ($1, $2)",
+          [reportId, visitor_id]
+        );
+      } catch (err) {
+        if (typeof err === "object" && err && "code" in err && (err as { code?: string }).code === "23505") {
+          await client.query("ROLLBACK");
+          return NextResponse.json(
+            { success: false, error: "ALREADY_VOTED", upvotes: report.upvotes },
+            { status: 409 }
+          );
+        }
+        throw err;
+      }
+
+      const updatedRes = await client.query<{ upvotes: number }>(
+        "UPDATE community_reports SET upvotes = upvotes + 1 WHERE id = $1 RETURNING upvotes",
+        [reportId]
+      );
+
+      await client.query("COMMIT");
+
+      return NextResponse.json({
+        success: true,
+        upvotes: updatedRes.rows[0]?.upvotes ?? report.upvotes + 1,
+      });
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
     }
-
-    // Increment upvotes via service client
-    const serviceClient = getSupabaseServiceClient();
-    const { data: updated } = await serviceClient
-      .from("community_reports")
-      .update({ upvotes: report.upvotes + 1 })
-      .eq("id", reportId)
-      .select("upvotes")
-      .single();
-
-    return NextResponse.json({
-      success: true,
-      upvotes: updated?.upvotes ?? report.upvotes + 1,
-    });
   } catch {
     return NextResponse.json(
       { error: "投票失败，请稍后再试" },

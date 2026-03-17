@@ -1,4 +1,7 @@
-export type LevelId = "golden-eye" | "debate" | "contract-maze";
+export type LevelId =
+  | "golden-eye"
+  | "debate"
+  | "contract-maze";
 
 export type GamePhase = "idle" | "playing" | "paused" | "game-over" | "victory";
 
@@ -91,6 +94,7 @@ export interface ContractScript {
   clauses: ContractClause[];
   magnifierUses: number;
 }
+
 
 // Chat message for Level 2
 export interface ChatMessage {

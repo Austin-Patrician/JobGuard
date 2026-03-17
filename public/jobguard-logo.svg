@@ -1,0 +1,67 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="shieldGradient" x1="110" y1="60" x2="420" y2="470" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3E5F86"/>
+      <stop offset="0.55" stop-color="#2B415E"/>
+      <stop offset="1" stop-color="#1B2838"/>
+    </linearGradient>
+    <linearGradient id="edgeGlow" x1="90" y1="40" x2="430" y2="470" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F6C7A6"/>
+      <stop offset="0.4" stop-color="#F6C7A6" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#7EA6D9" stop-opacity="0.1"/>
+    </linearGradient>
+    <radialGradient id="eyeGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 248) rotate(90) scale(88 128)">
+      <stop offset="0" stop-color="#F9E1C9"/>
+      <stop offset="0.55" stop-color="#F1B88F"/>
+      <stop offset="1" stop-color="#C55A43"/>
+    </radialGradient>
+    <linearGradient id="pupilGradient" x1="230" y1="230" x2="298" y2="298" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1B2838"/>
+      <stop offset="1" stop-color="#0F1620"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shield -->
+  <path
+    d="M256 40C318 40 372 62 404 76V228C404 334 334 412 256 472C178 412 108 334 108 228V76C140 62 194 40 256 40Z"
+    fill="url(#shieldGradient)"
+  />
+  <path
+    d="M256 52C312 52 360 72 388 84V224C388 318 326 390 256 442C186 390 124 318 124 224V84C152 72 200 52 256 52Z"
+    fill="none"
+    stroke="url(#edgeGlow)"
+    stroke-width="2"
+  />
+
+  <!-- Eye ring -->
+  <path
+    d="M128 254C158 196 208 168 256 168C304 168 354 196 384 254C354 312 304 340 256 340C208 340 158 312 128 254Z"
+    fill="url(#eyeGlow)"
+    opacity="0.95"
+  />
+  <path
+    d="M150 254C174 210 214 190 256 190C298 190 338 210 362 254C338 298 298 318 256 318C214 318 174 298 150 254Z"
+    fill="rgba(255,255,255,0.18)"
+  />
+
+  <!-- Pupil -->
+  <circle cx="256" cy="254" r="38" fill="url(#pupilGradient)"/>
+  <circle cx="242" cy="240" r="8" fill="#FFFFFF" opacity="0.85"/>
+
+  <!-- Guard mark -->
+  <path
+    d="M228 290L248 312L292 268"
+    stroke="#F6C7A6"
+    stroke-width="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Accent slash -->
+  <path
+    d="M170 150L342 362"
+    stroke="rgba(255,255,255,0.07)"
+    stroke-width="14"
+    stroke-linecap="round"
+  />
+</svg>

@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import { PixiLawScene } from "@/components/law/PixiLawScene";
 
 interface Citation {
   law: string;
@@ -30,10 +29,6 @@ export default function LawChatPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const chatBodyRef = useRef<HTMLDivElement>(null);
-
-  const lastAnswer = useMemo(() => {
-    return [...messages].reverse().find((msg) => msg.role === "assistant");
-  }, [messages]);
 
   useEffect(() => {
     const el = chatBodyRef.current;
@@ -91,100 +86,69 @@ export default function LawChatPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden text-white">
-      <div className="absolute inset-0">
-        <PixiLawScene />
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0b1220]/80 via-[#0b1220]/50 to-[#0b0f1e]" />
+    <div className="relative min-h-screen overflow-hidden story-surface text-[color:var(--ink)]">
 
-      <div className="relative z-10 mx-auto max-w-5xl px-4 py-12">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="law-bubble float-bob absolute left-6 top-10 h-20 w-20 rounded-full opacity-70" />
+        <div className="law-bubble float-bob-delayed absolute right-10 top-32 h-24 w-24 rounded-full opacity-60" />
+        <div className="law-bubble float-bob absolute left-16 bottom-24 h-16 w-16 rounded-full opacity-50" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:py-16">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-3">
-            <p className="text-xs uppercase tracking-[0.32em] text-white/60">
-              JobGuard · Labor Law Desk
-            </p>
-            <h1 className="font-display text-4xl sm:text-5xl">劳动法咨询</h1>
-            <p className="text-sm text-white/70">
-              对话为核心，引用法条，给出清晰、可执行的法律建议。
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="law-chip">劳动法咨询</span>
+              <span className="law-chip">引用法条</span>
+              <span className="law-chip">温柔答疑</span>
+            </div>
+            <h1 className="font-display text-4xl sm:text-5xl">法聊小屋</h1>
+            <p className="text-sm text-[color:var(--muted-ink)]">
+              用轻松的方式解释劳动法规，帮你把“话术”翻译成“规则”。
             </p>
           </div>
-          <Link href="/" className="text-xs font-semibold text-white/70">
+          <Link href="/dashboard" className="text-xs font-semibold text-[#6b7280]">
             返回首页
           </Link>
         </header>
 
-        <div className="mt-10 rounded-[32px] border border-white/10 bg-white/5 p-6 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.8)] backdrop-blur">
-          <div className="flex flex-col gap-6">
-            <div className="rounded-2xl border border-white/10 bg-white/10 px-5 py-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-xs uppercase tracking-[0.32em] text-white/60">
-                  最新结论
-                </p>
-                <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white/60">
-                  引用驱动
-                </span>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-white/90">
-                {lastAnswer?.content ?? "等待你的问题..."}
-              </p>
-              {lastAnswer?.citations && lastAnswer.citations.length > 0 && (
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {lastAnswer.citations.map((item, index) => (
-                    <div
-                      key={`${item.article}-${index}`}
-                      className="rounded-xl border border-white/10 bg-white/5 px-4 py-3"
-                    >
-                      <p className="text-xs font-semibold text-white">
-                        {item.law} {item.article}
-                      </p>
-                      <p className="mt-1 text-xs text-white/70">
-                        {item.summary}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div
-              ref={chatBodyRef}
-              className="max-h-[520px] space-y-4 overflow-y-auto pr-2"
-            >
+        <div className="mt-10 flex justify-center">
+          <div className="lawchat-shell">
+            <div ref={chatBodyRef} className="lawchat-body space-y-3">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
                   className={clsx(
-                    "flex flex-col gap-2",
-                    msg.role === "user" ? "items-end" : "items-start"
+                    "lawchat-row",
+                    msg.role === "user" ? "lawchat-row--right" : "lawchat-row--left"
                   )}
                 >
                   <div
                     className={clsx(
-                      "w-full max-w-[560px] rounded-2xl border px-4 py-3 text-sm leading-relaxed",
+                      "lawchat-bubble",
                       msg.role === "user"
-                        ? "border-white/20 bg-white/10 text-white"
-                        : "border-white/10 bg-white/5 text-white/90"
+                        ? "lawchat-bubble--user"
+                        : msg.role === "assistant"
+                          ? "lawchat-bubble--assistant"
+                          : "lawchat-bubble--system"
                     )}
                   >
-                    <p className="text-[11px] uppercase tracking-[0.24em] text-white/50">
-                      {msg.role === "user" ? "提问" : "解答"}
-                    </p>
-                    <p className="mt-2 whitespace-pre-wrap text-sm">
+                    <p className="whitespace-pre-wrap text-sm">
                       {msg.content}
                     </p>
                   </div>
 
                   {msg.citations && msg.citations.length > 0 && (
-                    <div className="w-full max-w-[560px] space-y-2">
+                    <div className="lawchat-citations">
                       {msg.citations.map((item, index) => (
                         <div
                           key={`${msg.id}-${index}`}
-                          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2"
+                          className="law-note px-4 py-2"
                         >
-                          <p className="text-[11px] font-semibold text-white">
+                          <p className="text-[11px] font-semibold text-[#8a5d42]">
                             {item.law} {item.article}
                           </p>
-                          <p className="mt-1 text-[11px] text-white/65">
+                          <p className="mt-1 text-[11px] text-[#8a6b5a]">
                             {item.summary}
                           </p>
                         </div>
@@ -195,13 +159,16 @@ export default function LawChatPage() {
               ))}
 
               {loading && (
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
-                  正在检索法条并生成解答...
+                <div className="lawchat-row lawchat-row--left">
+                  <div className="lawchat-bubble lawchat-bubble--assistant">
+                    正在检索法条并生成解答...
+                  </div>
                 </div>
               )}
+              <div />
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="lawchat-input">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -212,26 +179,24 @@ export default function LawChatPage() {
                   }
                 }}
                 placeholder="输入你的问题，例如：1年合同试用期6个月合理吗？"
-                className="min-h-[84px] flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none focus:border-white/30"
+                className="lawchat-textarea"
               />
               <button
                 type="button"
                 className={clsx(
-                  "rounded-2xl px-6 py-3 text-sm font-semibold text-white transition",
-                  loading
-                    ? "bg-white/20"
-                    : "bg-[#2f7bf6] hover:bg-[#2b6fe0]"
+                  "lawchat-send",
+                  loading && "lawchat-send--disabled"
                 )}
                 onClick={handleSend}
                 disabled={loading}
               >
-                {loading ? "处理中" : "发送咨询"}
+                {loading ? "处理中" : "发送"}
               </button>
             </div>
           </div>
         </div>
 
-        <p className="mt-6 text-xs text-white/60">
+        <p className="mt-6 text-xs text-[color:var(--muted-ink)]">
           回答仅供参考，涉及争议请咨询专业律师或主管部门。
         </p>
       </div>

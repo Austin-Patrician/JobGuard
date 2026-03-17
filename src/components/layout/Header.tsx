@@ -5,7 +5,12 @@ export function Header() {
     <header className="border-b border-gray-200 dark:border-gray-800">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="text-xl font-bold">
+          <Link href="/" className="flex items-center gap-2 text-xl font-bold">
+            <img
+              src="/jobguard-logo.svg"
+              alt="JobGuard"
+              className="h-7 w-7"
+            />
             JobGuard
           </Link>
           <nav className="flex items-center gap-6">

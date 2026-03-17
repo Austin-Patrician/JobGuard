@@ -2,7 +2,12 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { GameState, GameActions, LevelId, Rating } from "@/types/game";
+import type {
+  GameState,
+  GameActions,
+  LevelId,
+  Rating,
+} from "@/types/game";
 import { GAME_CONFIG } from "@/lib/constants";
 
 const initialLevels: GameState["levels"] = {
@@ -43,7 +48,11 @@ export const useGameStore = create<GameState & GameActions>()(
       completeLevel: (level: LevelId, score: number) => {
         const state = get();
         const rating = state.getRating(score);
-        const levelOrder: LevelId[] = ["golden-eye", "debate", "contract-maze"];
+        const levelOrder: LevelId[] = [
+          "golden-eye",
+          "debate",
+          "contract-maze",
+        ];
         const currentIndex = levelOrder.indexOf(level);
         const nextLevel = levelOrder[currentIndex + 1];
 
@@ -91,6 +100,7 @@ export const useGameStore = create<GameState & GameActions>()(
         if (score >= GAME_CONFIG.RATING_THRESHOLDS.C) return "C";
         return "D";
       },
+
     }),
     {
       name: "jobguard-game",
@@ -102,6 +112,39 @@ export const useGameStore = create<GameState & GameActions>()(
         currentLevel: state.currentLevel,
         levels: state.levels,
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as GameState | undefined;
+        if (!persisted) return currentState;
+
+        const mergedLevels = {
+          ...currentState.levels,
+          ...(persisted.levels ?? {}),
+        };
+
+        const levelOrder: LevelId[] = [
+          "golden-eye",
+          "debate",
+          "contract-maze",
+        ];
+
+        levelOrder.forEach((level, index) => {
+          if (mergedLevels[level]?.completed) {
+            const next = levelOrder[index + 1];
+            if (next) {
+              mergedLevels[next] = {
+                ...mergedLevels[next],
+                unlocked: true,
+              };
+            }
+          }
+        });
+
+        return {
+          ...currentState,
+          ...persisted,
+          levels: mergedLevels,
+        };
+      },
     }
   )
 );

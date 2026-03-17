@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
 import VoteButton from "./VoteButton";
 import type { CommunityReport } from "@/types/community";
 
@@ -62,6 +63,7 @@ export default function ReportCard({ report, index }: ReportCardProps) {
         }`}
       >
         <ReactMarkdown
+          rehypePlugins={[rehypeSanitize]}
           components={{
             p: ({ children }) => <p className="mb-2">{children}</p>,
           }}

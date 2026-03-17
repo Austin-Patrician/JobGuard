@@ -127,6 +127,64 @@ export default function DashboardPage() {
           ))}
         </div>
       </section>
+
+      <section className="mx-auto max-w-6xl px-4 pb-16">
+        <div className="story-card px-6 py-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted-ink)]">
+                劳动法资讯
+              </p>
+              <h3 className="mt-2 font-display text-2xl">
+                先看一条，再继续闯关
+              </h3>
+            </div>
+            <a
+              href="/law-chat"
+              className="rounded-full bg-[color:var(--accent)] px-5 py-2 text-xs font-semibold text-white shadow-[0_12px_26px_rgba(179,43,43,0.22)] transition hover:-translate-y-0.5"
+            >
+              进入法聊小屋
+            </a>
+          </div>
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            {[
+              {
+                title: "试用期最长多久？",
+                desc: "一年合同最多 2 个月，三年以上合同最多 6 个月。",
+                tag: "试用期",
+              },
+              {
+                title: "入职收费是否合法？",
+                desc: "用人单位不得以任何名义向劳动者收取财物。",
+                tag: "入职收费",
+              },
+              {
+                title: "社保必须从何时缴？",
+                desc: "入职当月起缴纳，试用期也必须缴。",
+                tag: "社保",
+              },
+              {
+                title: "劳务协议能替代劳动合同吗？",
+                desc: "不能。劳务协议不适用劳动法保护。",
+                tag: "合同",
+              },
+            ].map((item) => (
+              <div key={item.title} className="law-note px-4 py-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9a6a52]">
+                  {item.tag}
+                </p>
+                <p className="mt-2 text-sm font-semibold text-[#5b3b2c]">
+                  {item.title}
+                </p>
+                <p className="mt-2 text-xs text-[#8a6b5a]">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -32,8 +32,56 @@ interface ChinaMapProps {
   regions: RegionStat[];
 }
 
+function walkCoordinates(
+  coords: unknown,
+  cb: (lng: number, lat: number) => void,
+) {
+  if (!Array.isArray(coords)) return;
+  if (coords.length === 0) return;
+  if (typeof coords[0] === "number" && typeof coords[1] === "number") {
+    cb(coords[0] as number, coords[1] as number);
+    return;
+  }
+  for (const child of coords) {
+    walkCoordinates(child, cb);
+  }
+}
+
+function getGeoBounds(
+  geo: GeoJSON.FeatureCollection | null,
+): [[number, number], [number, number]] | null {
+  if (!geo) return null;
+  let minLng = Infinity;
+  let minLat = Infinity;
+  let maxLng = -Infinity;
+  let maxLat = -Infinity;
+
+  for (const feature of geo.features) {
+    const geometry = feature.geometry;
+    if (!geometry) continue;
+    walkCoordinates(geometry.coordinates, (lng, lat) => {
+      if (lng < minLng) minLng = lng;
+      if (lat < minLat) minLat = lat;
+      if (lng > maxLng) maxLng = lng;
+      if (lat > maxLat) maxLat = lat;
+    });
+  }
+
+  if (!isFinite(minLng) || !isFinite(minLat) || !isFinite(maxLng) || !isFinite(maxLat)) {
+    return null;
+  }
+
+  return [
+    [minLng, minLat],
+    [maxLng, maxLat],
+  ];
+}
+
 export default function ChinaMap({ regions }: ChinaMapProps) {
   const mapRef = useRef<MapRef>(null);
+  const hasFittedRef = useRef(false);
+  const isMapLoadedRef = useRef(false);
+  const lastSelectedRef = useRef<string | null>(null);
   const selectedRegion = useCommunityStore((s) => s.selectedRegion);
   const setSelectedRegion = useCommunityStore((s) => s.setSelectedRegion);
   const [hovered, setHovered] = useState<{
@@ -65,6 +113,7 @@ export default function ChinaMap({ regions }: ChinaMapProps) {
     () => Math.max(1, ...regions.map((r) => r.report_count)),
     [regions],
   );
+  const geoBounds = useMemo(() => getGeoBounds(geoData), [geoData]);
 
   // Load GeoJSON and merge region stats into feature properties
   useEffect(() => {
@@ -88,6 +137,17 @@ export default function ChinaMap({ regions }: ChinaMapProps) {
       });
   }, [regionLookup, maxCount]);
 
+  const fitToBoundsOnce = useCallback(() => {
+    if (!isMapLoadedRef.current || !geoBounds || hasFittedRef.current) return;
+    mapRef.current?.fitBounds(geoBounds, { padding: 24, duration: 200 });
+    hasFittedRef.current = true;
+  }, [geoBounds]);
+
+  const fitToBounds = useCallback(() => {
+    if (!isMapLoadedRef.current || !geoBounds) return;
+    mapRef.current?.fitBounds(geoBounds, { padding: 24, duration: 800 });
+  }, [geoBounds]);
+
   // FlyTo on selection change
   useEffect(() => {
     const map = mapRef.current;
@@ -105,14 +165,15 @@ export default function ChinaMap({ regions }: ChinaMapProps) {
           duration: 800,
         });
       }
-    } else {
-      map.flyTo({
-        center: [INITIAL_VIEW.longitude, INITIAL_VIEW.latitude],
-        zoom: INITIAL_VIEW.zoom,
-        duration: 800,
-      });
+    } else if (lastSelectedRef.current) {
+      fitToBounds();
     }
-  }, [selectedRegion, geoData]);
+    lastSelectedRef.current = selectedRegion;
+  }, [selectedRegion, geoData, fitToBounds]);
+
+  useEffect(() => {
+    fitToBoundsOnce();
+  }, [fitToBoundsOnce]);
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const onMouseMove = useCallback((e: any) => {
@@ -205,6 +266,10 @@ export default function ChinaMap({ regions }: ChinaMapProps) {
         mapStyle={baseStyle}
         maxBounds={MAX_BOUNDS}
         interactiveLayerIds={geoData ? ["province-fill"] : []}
+        onLoad={() => {
+          isMapLoadedRef.current = true;
+          fitToBoundsOnce();
+        }}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         onClick={onClick}

@@ -2,37 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import { streamText } from "ai";
 import { openai, AI_MODEL } from "@/lib/ai";
 import { MIRROR_SYSTEM_PROMPT } from "@/lib/prompts";
-
-const requestTimestamps = new Map<string, number[]>();
-const RATE_LIMIT = 10;
-const RATE_WINDOW_MS = 60_000;
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const timestamps = requestTimestamps.get(ip) ?? [];
-  const recent = timestamps.filter((t) => now - t < RATE_WINDOW_MS);
-  if (recent.length >= RATE_LIMIT) return false;
-  recent.push(now);
-  requestTimestamps.set(ip, recent);
-  return true;
-}
+import { getClientIp } from "@/lib/get-client-ip";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { parseJsonBody } from "@/lib/request-guard";
+import { RATE_LIMIT_CONFIG, BODY_SIZE_LIMITS, AI_INPUT_LIMITS } from "@/lib/constants";
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get("x-forwarded-for") ?? "unknown";
-    if (!checkRateLimit(ip)) {
+    const ip = getClientIp(request);
+    const { limit, windowMs } = RATE_LIMIT_CONFIG.AI;
+    if (!checkRateLimit(`mirror:${ip}`, limit, windowMs)) {
       return NextResponse.json(
         { error: "请求过于频繁，请稍后再试", code: "RATE_LIMIT" },
-        { status: 429 }
+        { status: 429, headers: { "Retry-After": String(Math.ceil(windowMs / 1000)) } }
       );
     }
 
-    const body = await request.json();
-    const { mode, text, imageBase64 } = body as {
+    const parsed = await parseJsonBody<{
       mode: "text" | "image";
       text?: string;
       imageBase64?: string;
-    };
+    }>(request, BODY_SIZE_LIMITS.MIRROR);
+    if (!parsed.ok) return parsed.response;
+    const { mode, text, imageBase64 } = parsed.data;
 
     if (mode === "text") {
       if (!text || text.length < 20) {
@@ -49,11 +41,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (mode === "image" && !imageBase64) {
-      return NextResponse.json(
-        { error: "请上传图片", code: "NO_IMAGE" },
-        { status: 400 }
-      );
+    if (mode === "image") {
+      if (!imageBase64) {
+        return NextResponse.json(
+          { error: "请上传图片", code: "NO_IMAGE" },
+          { status: 400 }
+        );
+      }
+      if (imageBase64.length > AI_INPUT_LIMITS.IMAGE_SINGLE_BASE64) {
+        return NextResponse.json(
+          { error: "图片大小不能超过2MB", code: "IMAGE_TOO_LARGE" },
+          { status: 400 }
+        );
+      }
     }
 
     const parseDataUrl = (value: string) => {
@@ -68,12 +68,12 @@ export async function POST(request: NextRequest) {
         : [
             { type: "text" as const, text: "请分析以下招聘截图中的内容：" },
             (() => {
-              const parsed = parseDataUrl(imageBase64!);
-              return parsed
+              const parsedUrl = parseDataUrl(imageBase64!);
+              return parsedUrl
                 ? {
                     type: "image" as const,
-                    image: parsed.data,
-                    mediaType: parsed.mediaType,
+                    image: parsedUrl.data,
+                    mediaType: parsedUrl.mediaType,
                   }
                 : { type: "image" as const, image: imageBase64! };
             })(),

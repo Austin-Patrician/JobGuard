@@ -1,29 +1,40 @@
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { dbQuery } from "@/lib/db";
+
+function normalizeTags(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((tag) => typeof tag === "string") as string[];
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed.filter((tag) => typeof tag === "string") as string[];
+      }
+    } catch {
+      // fall through
+    }
+  }
+  return [];
+}
 
 export async function GET() {
   try {
-    const supabase = getSupabaseServerClient();
-
     // Get total count
-    const { count: totalReports } = await supabase
-      .from("community_reports")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "approved");
+    const { rows: totalRows } = await dbQuery<{ count: number }>(
+      "SELECT COUNT(*)::int AS count FROM community_reports WHERE status = 'approved'"
+    );
+    const totalReports = totalRows[0]?.count ?? 0;
 
     // Get region aggregates
-    const { data: regionData } = await supabase
-      .from("community_reports")
-      .select("region, tags")
-      .eq("status", "approved")
-      .not("region", "is", null);
+    const { rows: regionData } = await dbQuery<{ region: string | null; tags: unknown }>(
+      "SELECT region, tags FROM community_reports WHERE status = 'approved' AND region IS NOT NULL"
+    );
 
     const regionMap = new Map<string, { count: number; tagCounts: Map<string, number> }>();
     for (const row of regionData ?? []) {
       if (!row.region) continue;
       const entry = regionMap.get(row.region) ?? { count: 0, tagCounts: new Map() };
       entry.count++;
-      for (const tag of row.tags ?? []) {
+      for (const tag of normalizeTags(row.tags)) {
         entry.tagCounts.set(tag, (entry.tagCounts.get(tag) ?? 0) + 1);
       }
       regionMap.set(row.region, entry);
@@ -42,17 +53,15 @@ export async function GET() {
     const tagCounts = new Map<string, number>();
     const industryCounts = new Map<string, number>();
     for (const row of regionData ?? []) {
-      for (const tag of row.tags ?? []) {
+      for (const tag of normalizeTags(row.tags)) {
         tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
       }
     }
 
     // Get industry data
-    const { data: industryData } = await supabase
-      .from("community_reports")
-      .select("industry")
-      .eq("status", "approved")
-      .not("industry", "is", null);
+    const { rows: industryData } = await dbQuery<{ industry: string | null }>(
+      "SELECT industry FROM community_reports WHERE status = 'approved' AND industry IS NOT NULL"
+    );
 
     for (const row of industryData ?? []) {
       if (row.industry) {
@@ -71,7 +80,7 @@ export async function GET() {
       .map(([industry, count]) => ({ industry, count }));
 
     return NextResponse.json({
-      total_reports: totalReports ?? 0,
+      total_reports: totalReports,
       regions,
       top_tags,
       top_industries,

@@ -62,7 +62,7 @@ export default function GameHubPage() {
 
         <section className="mt-10 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="paper-card p-6 sm:p-8">
-            <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--muted-ink)]">
                   剧情闯关模块
@@ -70,6 +70,9 @@ export default function GameHubPage() {
                 <h2 className="mt-2 font-display text-3xl sm:text-4xl">
                   按顺序挑战，才能进入下一关
                 </h2>
+                <p className="mt-2 text-sm text-[color:var(--muted-ink)]">
+                  每个关卡都对应一个真实求职陷阱，完成后将解锁更复杂的任务。
+                </p>
               </div>
               <div className="rounded-2xl bg-black/5 px-4 py-3 text-center">
                 <p className="text-[11px] uppercase tracking-[0.26em] text-[color:var(--muted-ink)]">
@@ -82,41 +85,51 @@ export default function GameHubPage() {
               </div>
             </div>
 
-            <div className="relative mt-8 space-y-6">
+            <div className="relative mt-8 space-y-5">
               {levels.map((level, index) => {
                 const info = progress[level.id as keyof typeof progress];
                 const locked = !info?.unlocked;
                 const completed = info?.completed;
+                const isLast = index === levels.length - 1;
                 return (
-                  <div key={level.id} className="relative">
+                  <div key={level.id} className="relative pl-7">
+                    {!isLast && (
+                      <span className="absolute left-[7px] top-10 bottom-0 w-px story-line" />
+                    )}
+                    <span
+                      className={clsx(
+                        "absolute left-0 top-8 h-3 w-3 rounded-full story-orb",
+                        locked && "opacity-50"
+                      )}
+                    />
                     <div
                       className={clsx(
-                        "rounded-2xl border px-5 py-4 shadow-sm transition",
-                        locked
-                          ? "border-black/10 bg-white/70 text-[color:var(--muted-ink)]"
-                          : "border-[color:var(--paper-edge)] bg-white"
+                        "story-card px-5 py-4 transition sm:px-6",
+                        locked && "opacity-80"
                       )}
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted-ink)]">
+                          <p className="text-[11px] uppercase tracking-[0.3em] text-[color:var(--muted-ink)]">
                             {level.chapter}
                           </p>
-                          <h3 className="mt-1 font-display text-2xl">
-                            {level.title}
-                          </h3>
-                          <p className="mt-1 text-xs text-[color:var(--muted-ink)]">
-                            {level.subtitle}
-                          </p>
+                          <div className="mt-1 flex flex-wrap items-baseline gap-2">
+                            <h3 className="font-display text-2xl">
+                              {level.title}
+                            </h3>
+                            <span className="text-xs text-[color:var(--muted-ink)]">
+                              {level.subtitle}
+                            </span>
+                          </div>
                         </div>
                         <div
                           className={clsx(
-                            "rounded-full px-3 py-1 text-xs font-semibold",
+                            "rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em]",
                             locked
-                              ? "bg-black/10 text-[color:var(--muted-ink)]"
+                              ? "border-transparent bg-black/5 text-[color:var(--muted-ink)]"
                               : completed
-                                ? "bg-emerald-200/70 text-emerald-900"
-                                : "bg-amber-200/70 text-amber-900"
+                                ? "border-emerald-200/60 bg-emerald-200/40 text-emerald-900"
+                                : "border-amber-200/60 bg-amber-200/40 text-amber-900"
                           )}
                         >
                           {locked ? "未解锁" : completed ? "已完成" : "当前关"}
@@ -126,18 +139,19 @@ export default function GameHubPage() {
                       <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted-ink)]">
                         {level.description}
                       </p>
+
                       <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <span className="boss-chip">{level.vibe}</span>
-                        <span className="boss-chip">
+                        <span className="story-chip">{level.vibe}</span>
+                        <span className="story-chip">
                           最佳评分 {info?.rating ?? "—"}
                         </span>
                         {locked && index > 0 && (
-                          <span className="boss-chip">完成上一关解锁</span>
+                          <span className="story-chip">完成上一关解锁</span>
                         )}
                       </div>
 
                       <div className="mt-4 flex items-center justify-between">
-                        <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--muted-ink)]">
+                        <p className="text-[11px] uppercase tracking-[0.22em] text-[color:var(--muted-ink)]">
                           {locked ? "尚未解锁" : "可进入"}
                         </p>
                         <Link
@@ -159,19 +173,19 @@ export default function GameHubPage() {
             </div>
           </div>
 
-          <div className="glass-panel rounded-3xl p-6">
+          <div className="glass-panel self-start rounded-3xl p-6">
             <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--muted-ink)]">
               模式说明
             </p>
-            <h3 className="mt-3 font-display text-2xl">
+            <h3 className="mt-2 font-display text-2xl">
               剧情闯关玩法
             </h3>
-            <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted-ink)]">
+            <p className="mt-2 text-sm leading-relaxed text-[color:var(--muted-ink)]">
               每一关都以真实求职陷阱为蓝本。识破得分越高，后续关卡越容易通过。
             </p>
-            <div className="mt-4 space-y-3 text-sm text-[color:var(--muted-ink)]">
+            <div className="mt-4 grid gap-3 text-sm text-[color:var(--muted-ink)]">
               <div className="rounded-2xl border border-[color:var(--paper-edge)] bg-white px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--muted-ink)]">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--muted-ink)]">
                   目标
                 </p>
                 <p className="mt-2">
@@ -179,7 +193,7 @@ export default function GameHubPage() {
                 </p>
               </div>
               <div className="rounded-2xl border border-[color:var(--paper-edge)] bg-white px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--muted-ink)]">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--muted-ink)]">
                   进阶
                 </p>
                 <p className="mt-2">
@@ -187,7 +201,7 @@ export default function GameHubPage() {
                 </p>
               </div>
               <div className="rounded-2xl border border-[color:var(--paper-edge)] bg-white px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--muted-ink)]">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--muted-ink)]">
                   建议
                 </p>
                 <p className="mt-2">

@@ -3,11 +3,11 @@ import { generateText } from "ai";
 import { createHash } from "crypto";
 import { openai, AI_MODEL } from "@/lib/ai";
 import { COMMUNITY_MODERATION_PROMPT } from "@/lib/prompts";
-import { COMMUNITY_CONFIG } from "@/lib/constants";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { getSupabaseServiceClient } from "@/lib/supabase/server";
-import { getVisitorIdFromRequest } from "@/lib/visitor";
+import { COMMUNITY_CONFIG, BODY_SIZE_LIMITS } from "@/lib/constants";
+import { dbQuery } from "@/lib/db";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/get-client-ip";
+import { parseJsonBody } from "@/lib/request-guard";
 import type { ModerationResult } from "@/types/community";
 
 function hashIP(ip: string): string {
@@ -24,6 +24,21 @@ function tryParseModerationJSON(text: string): ModerationResult | null {
   }
 }
 
+function normalizeTags(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((tag) => typeof tag === "string") as string[];
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed.filter((tag) => typeof tag === "string") as string[];
+      }
+    } catch {
+      // fall through
+    }
+  }
+  return [];
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -33,29 +48,47 @@ export async function GET(request: NextRequest) {
     const tag = searchParams.get("tag");
     const sort = searchParams.get("sort") === "popular" ? "popular" : "newest";
 
-    const supabase = getSupabaseServerClient();
-    let query = supabase
-      .from("community_reports")
-      .select("id, sanitized_content, summary, tags, region, city, industry, scam_type, upvotes, view_count, created_at", { count: "exact" })
-      .eq("status", "approved");
+    const whereClauses = ["status = 'approved'"];
+    const params: unknown[] = [];
+    let paramIndex = 1;
 
-    if (region) query = query.eq("region", region);
-    if (tag) query = query.contains("tags", [tag]);
-
-    if (sort === "popular") {
-      query = query.order("upvotes", { ascending: false }).order("created_at", { ascending: false });
-    } else {
-      query = query.order("created_at", { ascending: false });
+    if (region) {
+      whereClauses.push(`region = $${paramIndex}`);
+      params.push(region);
+      paramIndex++;
+    }
+    if (tag) {
+      whereClauses.push(`tags IS NOT NULL AND to_jsonb(tags) ? $${paramIndex}`);
+      params.push(tag);
+      paramIndex++;
     }
 
-    query = query.range((page - 1) * pageSize, page * pageSize - 1);
+    const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
+    const countSql = `SELECT COUNT(*)::int AS count FROM community_reports ${whereSql}`;
+    const { rows: countRows } = await dbQuery<{ count: number }>(countSql, params);
 
-    const { data, count, error } = await query;
-    if (error) throw error;
+    const orderBy = sort === "popular"
+      ? "ORDER BY upvotes DESC, created_at DESC"
+      : "ORDER BY created_at DESC";
+
+    const listSql = `
+      SELECT id, sanitized_content, summary, tags, region, city, industry, scam_type, upvotes, view_count, created_at
+      FROM community_reports
+      ${whereSql}
+      ${orderBy}
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `;
+    const listParams = [...params, pageSize, (page - 1) * pageSize];
+    const { rows } = await dbQuery(listSql, listParams);
+
+    const items = rows.map((row) => ({
+      ...row,
+      tags: normalizeTags((row as { tags?: unknown }).tags),
+    }));
 
     return NextResponse.json({
-      items: data ?? [],
-      total: count ?? 0,
+      items,
+      total: countRows[0]?.count ?? 0,
       page,
       pageSize,
     });
@@ -69,7 +102,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const ip = getClientIp(request);
     const ipHash = hashIP(ip);
 
     const { limit: ipLimit, windowMs: ipWindow } = COMMUNITY_CONFIG.RATE_LIMITS.IP_SUBMIT;
@@ -80,8 +113,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
-    const { content, visitor_id } = body as { content?: string; visitor_id?: string };
+    const parsed = await parseJsonBody<{ content?: string; visitor_id?: string }>(request, BODY_SIZE_LIMITS.COMMUNITY_REPORT);
+    if (!parsed.ok) return parsed.response;
+    const { content, visitor_id } = parsed.data;
 
     if (!visitor_id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(visitor_id)) {
       return NextResponse.json(
@@ -111,20 +145,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getSupabaseServerClient();
-    const { data: inserted, error: insertError } = await supabase
-      .from("community_reports")
-      .insert({
-        visitor_id,
-        raw_content: content,
-        status: "pending",
-        ip_hash: ipHash,
-      })
-      .select("id")
-      .single();
-
-    if (insertError) throw insertError;
-    const reportId = inserted.id;
+    const insertSql = `
+      INSERT INTO community_reports (visitor_id, raw_content, status, ip_hash)
+      VALUES ($1, $2, 'pending', $3)
+      RETURNING id
+    `;
+    const { rows: insertRows } = await dbQuery<{ id: string }>(insertSql, [visitor_id, content, ipHash]);
+    const reportId = insertRows[0]?.id;
+    if (!reportId) {
+      throw new Error("Failed to insert report");
+    }
 
     // AI moderation
     let moderationResult: ModerationResult | null = null;
@@ -141,24 +171,33 @@ export async function POST(request: NextRequest) {
       // AI failed — flag for manual review
     }
 
-    const serviceClient = getSupabaseServiceClient();
-
     if (moderationResult) {
       const newStatus = moderationResult.approved ? "approved" : "rejected";
-      await serviceClient
-        .from("community_reports")
-        .update({
-          sanitized_content: moderationResult.sanitized_content,
-          summary: moderationResult.summary,
-          tags: moderationResult.tags,
-          region: moderationResult.region,
-          city: moderationResult.city,
-          industry: moderationResult.industry,
-          scam_type: moderationResult.scam_type,
-          status: newStatus,
-          reject_reason: moderationResult.reject_reason,
-        })
-        .eq("id", reportId);
+      const updateSql = `
+        UPDATE community_reports
+        SET sanitized_content = $1,
+            summary = $2,
+            tags = $3,
+            region = $4,
+            city = $5,
+            industry = $6,
+            scam_type = $7,
+            status = $8,
+            reject_reason = $9
+        WHERE id = $10
+      `;
+      await dbQuery(updateSql, [
+        moderationResult.sanitized_content,
+        moderationResult.summary,
+        moderationResult.tags ?? [],
+        moderationResult.region,
+        moderationResult.city,
+        moderationResult.industry,
+        moderationResult.scam_type,
+        newStatus,
+        moderationResult.reject_reason,
+        reportId,
+      ]);
 
       return NextResponse.json({
         id: reportId,
@@ -171,10 +210,10 @@ export async function POST(request: NextRequest) {
     }
 
     // AI response unparseable → flag
-    await serviceClient
-      .from("community_reports")
-      .update({ status: "flagged" })
-      .eq("id", reportId);
+    await dbQuery(
+      `UPDATE community_reports SET status = 'flagged' WHERE id = $1`,
+      [reportId]
+    );
 
     return NextResponse.json({
       id: reportId,

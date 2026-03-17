@@ -17,6 +17,11 @@ const sansFont = IBM_Plex_Sans_Condensed({
 export const metadata: Metadata = {
   title: "JobGuard",
   description: "JobGuard - Your Job Protection Platform",
+  icons: {
+    icon: "/jobguard-logo.svg",
+    shortcut: "/jobguard-logo.svg",
+    apple: "/jobguard-logo.svg",
+  },
 };
 
 export default function RootLayout({

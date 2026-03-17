@@ -20,6 +20,7 @@ const ChinaMap = dynamic(() => import("@/components/community/ChinaMap"), {
 
 export default function CommunityPage() {
   const [stats, setStats] = useState<CommunityStats | null>(null);
+  const [showAllIndustries, setShowAllIndustries] = useState(false);
 
   useEffect(() => {
     fetch(API_ROUTES.COMMUNITY.STATS)
@@ -29,6 +30,12 @@ export default function CommunityPage() {
   }, []);
 
   const topScamType = stats?.top_tags?.[0]?.tag ?? null;
+  const industries = stats?.top_industries ?? [];
+  const maxIndustries = 10;
+  const shouldCollapseIndustries = industries.length > maxIndustries;
+  const visibleIndustries = shouldCollapseIndustries && !showAllIndustries
+    ? industries.slice(0, maxIndustries)
+    : industries;
 
   return (
     <div className="min-h-screen intel-surface text-[color:var(--ink)]">
@@ -50,12 +57,20 @@ export default function CommunityPage() {
               匿名分享求职踩坑经历，AI 自动脱敏保护隐私。查看全国避坑热力图。
             </p>
           </div>
-          <Link
-            href="/community/submit"
-            className="inline-block rounded-full bg-[color:var(--accent)] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(179,43,43,0.3)] transition hover:-translate-y-0.5"
-          >
-            提交情报
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/community/submit"
+              className="inline-block rounded-full bg-[color:var(--accent)] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(179,43,43,0.3)] transition hover:-translate-y-0.5"
+            >
+              提交情报
+            </Link>
+            <Link
+              href="/"
+              className="inline-block rounded-full border border-[color:var(--paper-edge)] bg-white/70 px-5 py-2.5 text-sm font-semibold text-[color:var(--ink)] transition hover:-translate-y-0.5 hover:bg-white"
+            >
+              返回首页
+            </Link>
+          </div>
         </motion.div>
       </section>
 
@@ -80,21 +95,32 @@ export default function CommunityPage() {
             <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[color:var(--muted-ink)]">
               骗术标签
             </p>
-            <TagCloud tags={stats?.top_tags ?? []} />
+            <TagCloud tags={stats?.top_tags ?? []} maxVisible={12} compact />
           </div>
 
-          {stats?.top_industries && stats.top_industries.length > 0 && (
+          {industries.length > 0 && (
             <div className="paper-card p-5">
               <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[color:var(--muted-ink)]">
                 高发行业
               </p>
-              <div className="flex flex-wrap gap-2">
-                {stats.top_industries.map(({ industry, count }) => (
-                  <span key={industry} className="tag-chip">
-                    {industry}
-                    <span className="ml-1 opacity-60">{count}</span>
-                  </span>
-                ))}
+              <div className="space-y-2">
+                <div className="flex flex-wrap gap-2">
+                  {visibleIndustries.map(({ industry, count }) => (
+                    <span key={industry} className="tag-chip tag-chip--compact">
+                      {industry}
+                      <span className="ml-1 opacity-60">{count}</span>
+                    </span>
+                  ))}
+                </div>
+                {shouldCollapseIndustries && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllIndustries((prev) => !prev)}
+                    className="text-xs font-semibold text-[color:var(--muted-ink)] transition hover:opacity-80"
+                  >
+                    {showAllIndustries ? "收起" : `展开全部 (${industries.length})`}
+                  </button>
+                )}
               </div>
             </div>
           )}

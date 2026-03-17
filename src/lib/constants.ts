@@ -69,6 +69,34 @@ export const API_ROUTES = {
   HEALTH: "/health",
 } as const;
 
+export const RATE_LIMIT_CONFIG = {
+  GLOBAL: { limit: 60, windowMs: 60 * 1000 },
+  AI: { limit: 5, windowMs: 60 * 1000 },
+  AUTH: { limit: 3, windowMs: 15 * 60 * 1000 },
+  VIEW_COUNT: { limit: 1, windowMs: 60 * 60 * 1000 },
+} as const;
+
+export const BODY_SIZE_LIMITS = {
+  LAW_CHAT: 10 * 1024,          // 10KB
+  MIRROR: 3 * 1024 * 1024,      // 3MB
+  CONTRACT: 15 * 1024 * 1024,   // 15MB
+  COMMUNITY_REPORT: 10 * 1024,  // 10KB
+  COMMUNITY_VOTE: 1024,         // 1KB
+} as const;
+
+export const AI_INPUT_LIMITS = {
+  LAW_CHAT_QUESTION: 2000,
+  CONTRACT_TEXT: 50_000,
+  IMAGE_SINGLE_BASE64: 2 * 1024 * 1024,  // 2MB base64 encoded
+  IMAGE_TOTAL_BASE64: 10 * 1024 * 1024,  // 10MB total
+} as const;
+
+export const AI_ENDPOINTS = [
+  "/api/law-chat",
+  "/api/toolkit/mirror",
+  "/api/toolkit/contract",
+] as const;
+
 export const COMMUNITY_CONFIG = {
   CONTENT_MIN_LENGTH: 50,
   CONTENT_MAX_LENGTH: 5000,
