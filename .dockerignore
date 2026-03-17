@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.env
+.env.local
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+*.md
+!README.md
+LICENSE
+.vscode
+.idea

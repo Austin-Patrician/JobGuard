@@ -79,7 +79,8 @@
       "Bash(cd E:/code/austin/JobGuard && node -e \"\nconst d=JSON.parse\\(require\\('fs'\\).readFileSync\\('src/data/law/law.index.json','utf8'\\)\\);\n// Check a few articles\nconst samples = [\n  d.articles.find\\(a => a.articleNo === '第四十七条' && a.lawId === 'labor-contract-law'\\),\n  d.articles.find\\(a => a.articleNo === '第十九条' && a.lawId === 'labor-contract-law'\\),\n  d.articles.find\\(a => a.articleNo === '第三十六条' && a.lawId === 'labor-law'\\),\n  d.articles.find\\(a => a.articleNo === '第七十二条' && a.lawId === 'labor-law'\\),\n];\nfor \\(const s of samples\\) {\n  if \\(!s\\) continue;\n  console.log\\('---'\\);\n  console.log\\(s.lawName, s.articleNo\\);\n  console.log\\('Chapter:', s.chapter\\);\n  console.log\\('Section:', s.section\\);\n  console.log\\('Topics:', s.topics\\);\n  console.log\\('Summary:', s.summary.slice\\(0, 80\\)\\);\n}\n\")",
       "Bash(cd E:/code/austin/JobGuard && npx tsc --noEmit --pretty 2>&1 | head -40)",
       "Bash(cd E:/code/austin/JobGuard && npx tsc --noEmit --pretty 2>&1 | grep -E \"route\\\\.ts|prompts\\\\.ts\" | head -10)",
-      "Bash(cd E:/code/austin/JobGuard && npm run build 2>&1 | tail -20)"
+      "Bash(cd E:/code/austin/JobGuard && npm run build 2>&1 | tail -20)",
+      "Bash(cd E:/code/austin/JobGuard && ls -la deploy-*.sh deploy-*.ps1 Dockerfile docker-compose.yml .dockerignore)"
     ]
   }
 }
