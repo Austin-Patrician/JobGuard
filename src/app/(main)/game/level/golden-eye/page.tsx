@@ -90,7 +90,7 @@ function buildSentenceChunks(script: JDScript): SentenceChunk[] {
         text: "\n",
         scriptId: script.id,
         trapIds: [],
-        isBreak: true,
+        isBreak: true as const,
       };
     }
     const trapIds = traps
@@ -101,6 +101,7 @@ function buildSentenceChunks(script: JDScript): SentenceChunk[] {
       text: chunk.text,
       scriptId: script.id,
       trapIds,
+      isBreak: false as const,
     };
   });
 

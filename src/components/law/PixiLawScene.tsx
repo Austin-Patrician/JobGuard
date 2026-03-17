@@ -174,7 +174,7 @@ export function PixiLawScene() {
         glow.y = height * 0.22;
       };
 
-      app.ticker.add(animate);
+      app.ticker.add(animate as unknown as import("pixi.js").TickerCallback<unknown>);
 
       const resize = () => {
         if (!containerRef.current) return;

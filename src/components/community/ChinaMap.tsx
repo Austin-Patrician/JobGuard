@@ -59,7 +59,7 @@ function getGeoBounds(
   for (const feature of geo.features) {
     const geometry = feature.geometry;
     if (!geometry) continue;
-    walkCoordinates(geometry.coordinates, (lng, lat) => {
+    walkCoordinates((geometry as { coordinates: unknown }).coordinates, (lng, lat) => {
       if (lng < minLng) minLng = lng;
       if (lat < minLat) minLat = lat;
       if (lng > maxLng) maxLng = lng;

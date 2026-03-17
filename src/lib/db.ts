@@ -1,3 +1,4 @@
+// @ts-expect-error -- no @types/pg installed
 import { Pool } from "pg";
 
 type GlobalWithPg = typeof globalThis & {

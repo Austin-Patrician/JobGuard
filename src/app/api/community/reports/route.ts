@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
     const listParams = [...params, pageSize, (page - 1) * pageSize];
     const { rows } = await dbQuery(listSql, listParams);
 
-    const items = rows.map((row) => ({
+    const items = rows.map((row: Record<string, unknown>) => ({
       ...row,
       tags: normalizeTags((row as { tags?: unknown }).tags),
     }));
