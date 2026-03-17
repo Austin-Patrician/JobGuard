@@ -68,10 +68,19 @@ fi
 info "正在构建 Docker 镜像..."
 
 if [ "$NO_DB" = true ]; then
-  $DC build jobguard
+  # 绕过 docker-compose，避免解析 postgres 服务并拉取镜像
+  docker build -t jobguard:latest .
   if [ "$BUILD_ONLY" = false ]; then
     info "启动 JobGuard（不含数据库）..."
-    $DC up -d jobguard
+    # 停掉旧容器（如果存在）
+    docker rm -f jobguard 2>/dev/null || true
+    docker run -d \
+      --name jobguard \
+      --restart unless-stopped \
+      --env-file .env \
+      -e NODE_ENV=production \
+      -p "${PORT:-3000}:3000" \
+      jobguard:latest
   fi
 else
   $DC build
@@ -106,4 +115,8 @@ done
 
 echo ""
 warn "服务可能还在启动中，请稍后访问 http://localhost:${PORT}"
-warn "查看日志: $DC logs -f jobguard"
+if [ "$NO_DB" = true ]; then
+  warn "查看日志: docker logs -f jobguard"
+else
+  warn "查看日志: $DC logs -f jobguard"
+fi
