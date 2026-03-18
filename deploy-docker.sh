@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # JobGuard 一键部署脚本 — Docker 版
-# 用法: bash deploy-docker.sh [--build-only] [--no-db]
+# 用法: bash deploy-docker.sh [--build-only] [--no-db] [--domain example.com]
 #
 set -euo pipefail
 
@@ -17,10 +17,29 @@ error() { echo -e "${RED}[ERROR]${NC} $*"; exit 1; }
 # ── 参数解析 ──────────────────────────────────────────────────────────────────
 BUILD_ONLY=false
 NO_DB=false
-for arg in "$@"; do
-  case "$arg" in
-    --build-only) BUILD_ONLY=true ;;
-    --no-db)      NO_DB=true ;;
+DOMAIN="${DOMAIN:-}"
+APP_BIND_IP="${APP_BIND_IP:-}"
+PUBLIC_URL_SCHEME="${PUBLIC_URL_SCHEME:-}"
+PROXY_HTTP_PORT="${PROXY_HTTP_PORT:-}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --build-only)
+      BUILD_ONLY=true
+      shift
+      ;;
+    --no-db)
+      NO_DB=true
+      shift
+      ;;
+    --domain)
+      [ $# -ge 2 ] || error "--domain 需要提供域名"
+      DOMAIN="$2"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
   esac
 done
 
@@ -43,7 +62,6 @@ if [ ! -f .env ]; then
   fi
 fi
 
-# 检查关键变量
 source_env() {
   set -a
   # shellcheck disable=SC1091
@@ -56,14 +74,23 @@ if [ "${OPENAI_API_KEY:-}" = "your-openai-key" ] || [ -z "${OPENAI_API_KEY:-}" ]
   warn "OPENAI_API_KEY 未配置，AI 功能将不可用"
 fi
 
-# 解析端口：优先 PORT 变量，其次从 NEXT_PUBLIC_APP_URL 提取，默认 3000
 if [ -z "${PORT:-}" ]; then
   PORT=$(echo "${NEXT_PUBLIC_APP_URL:-}" | grep -oP ':\K[0-9]+$' || echo "3000")
 fi
 PORT="${PORT:-3000}"
-info "使用端口: $PORT"
+PUBLIC_URL_SCHEME="${PUBLIC_URL_SCHEME:-https}"
+info "应用端口: $PORT"
 
-# ── 构建 & 启动 ──────────────────────────────────────────────────────────────
+if [ -n "$DOMAIN" ]; then
+  NEXT_PUBLIC_APP_URL="${PUBLIC_URL_SCHEME}://${DOMAIN}"
+  APP_BIND_IP="${APP_BIND_IP:-127.0.0.1}"
+  PROXY_HTTP_PORT="${PROXY_HTTP_PORT:-80}"
+  info "启用域名反向代理: ${DOMAIN}"
+  info "外部访问地址将使用: ${NEXT_PUBLIC_APP_URL}"
+else
+  APP_BIND_IP="${APP_BIND_IP:-0.0.0.0}"
+fi
+
 if command -v docker compose >/dev/null 2>&1; then
   DC="docker compose"
 elif command -v docker-compose >/dev/null 2>&1; then
@@ -72,48 +99,96 @@ else
   error "未检测到 docker compose，请升级 Docker 或安装 docker-compose"
 fi
 
-info "正在构建 Docker 镜像..."
+prepare_proxy_config() {
+  local template_path="deploy/nginx/default.conf.template"
+  local output_path=".deploy/nginx/default.conf"
+  local server_names="$DOMAIN"
 
-if [ "$NO_DB" = true ]; then
-  # 绕过 docker-compose，避免解析 postgres 服务并拉取镜像
-  docker build -t jobguard:latest .
-  if [ "$BUILD_ONLY" = false ]; then
-    info "启动 JobGuard（不含数据库）..."
-    # 停掉旧容器（如果存在）
-    docker rm -f jobguard 2>/dev/null || true
-    docker run -d \
-      --name jobguard \
-      --restart unless-stopped \
-      --env-file .env \
-      -e NODE_ENV=production \
-      -e PORT="${PORT}" \
-      -e HOSTNAME=0.0.0.0 \
-      -p "${PORT}:${PORT}" \
-      jobguard:latest
+  if [ -n "${DOMAIN_ALIASES:-}" ]; then
+    server_names="${server_names} ${DOMAIN_ALIASES}"
   fi
-else
-  $DC build
-  if [ "$BUILD_ONLY" = false ]; then
-    info "启动 JobGuard + PostgreSQL..."
-    $DC up -d
+
+  mkdir -p .deploy/nginx
+  sed \
+    -e "s|__SERVER_NAMES__|${server_names}|g" \
+    -e "s|__APP_PORT__|${PORT}|g" \
+    "$template_path" > "$output_path"
+}
+
+cleanup_legacy_container() {
+  local name="$1"
+  if docker ps -a --format '{{.Names}}' | grep -qx "$name"; then
+    info "移除旧容器: $name"
+    docker rm -f "$name" >/dev/null 2>&1 || true
   fi
+}
+
+SERVICES=("jobguard")
+if [ "$NO_DB" = false ]; then
+  SERVICES=("postgres" "jobguard")
 fi
+if [ -n "$DOMAIN" ]; then
+  SERVICES+=("nginx")
+fi
+
+if [ -n "$DOMAIN" ]; then
+  prepare_proxy_config
+fi
+
+cleanup_legacy_container "jobguard"
+cleanup_legacy_container "jobguard-proxy"
+if [ "$NO_DB" = false ]; then
+  cleanup_legacy_container "jobguard-db"
+fi
+
+export PORT
+export APP_BIND_IP
+export PROXY_HTTP_PORT="${PROXY_HTTP_PORT:-80}"
+export NEXT_PUBLIC_APP_NAME="${NEXT_PUBLIC_APP_NAME:-JobGuard}"
+export NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL:-http://localhost:${PORT}}"
+export NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-}"
+export NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}"
+
+info "正在构建 Docker 镜像..."
+$DC build jobguard
 
 if [ "$BUILD_ONLY" = true ]; then
   info "构建完成（仅构建模式，未启动服务）"
   exit 0
 fi
 
+info "启动服务: ${SERVICES[*]}"
+$DC up -d "${SERVICES[@]}"
+
+if [ "$NO_DB" = true ]; then
+  $DC stop postgres >/dev/null 2>&1 || true
+fi
+if [ -z "$DOMAIN" ]; then
+  $DC stop nginx >/dev/null 2>&1 || true
+fi
+
 # ── 等待启动 ──────────────────────────────────────────────────────────────────
 info "等待服务启动..."
 sleep 3
 
+HEALTHCHECK_URL="http://localhost:${PORT}/api/health"
+DISPLAY_URL="http://localhost:${PORT}"
+if [ -n "$DOMAIN" ]; then
+  HEALTHCHECK_URL="http://localhost:${PROXY_HTTP_PORT}/api/health"
+  DISPLAY_URL="${NEXT_PUBLIC_APP_URL}"
+fi
+
 for i in $(seq 1 15); do
-  if curl -sf "http://localhost:${PORT}/api/health" >/dev/null 2>&1; then
+  if curl -sf "$HEALTHCHECK_URL" >/dev/null 2>&1; then
     echo ""
     info "============================================"
     info "  JobGuard 部署成功!"
-    info "  访问地址: http://localhost:${PORT}"
+    info "  访问地址: ${DISPLAY_URL}"
+    if [ -n "$DOMAIN" ]; then
+      info "  源站入口: http://${DOMAIN}:${PROXY_HTTP_PORT}"
+      warn "Cloudflare 橙色云模式下，请使用 80/443，不要继续访问 :${PORT}"
+      warn "若源站未配置证书，请在 Cloudflare SSL/TLS 中使用 Flexible"
+    fi
     info "============================================"
     exit 0
   fi
@@ -122,9 +197,5 @@ for i in $(seq 1 15); do
 done
 
 echo ""
-warn "服务可能还在启动中，请稍后访问 http://localhost:${PORT}"
-if [ "$NO_DB" = true ]; then
-  warn "查看日志: docker logs -f jobguard"
-else
-  warn "查看日志: $DC logs -f jobguard"
-fi
+warn "服务可能还在启动中，请稍后访问 ${DISPLAY_URL}"
+warn "查看日志: $DC logs -f ${SERVICES[*]}"
