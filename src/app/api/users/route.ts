@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createUuid } from "@/lib/uuid";
 
 // GET /api/users - List users
 export async function GET() {
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         message: "User created",
-        user: { id: crypto.randomUUID(), name, email },
+        user: { id: createUuid(), name, email },
       },
       { status: 201 }
     );

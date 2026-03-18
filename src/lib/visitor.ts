@@ -1,3 +1,5 @@
+import { createUuid } from "@/lib/uuid";
+
 const STORAGE_KEY = "jobguard-visitor-id";
 const COOKIE_NAME = "jobguard-vid";
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -8,7 +10,7 @@ export function getVisitorId(): string {
   let id = localStorage.getItem(STORAGE_KEY);
   if (id && UUID_REGEX.test(id)) return id;
 
-  id = crypto.randomUUID();
+  id = createUuid();
   localStorage.setItem(STORAGE_KEY, id);
   document.cookie = `${COOKIE_NAME}=${id}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
   return id;

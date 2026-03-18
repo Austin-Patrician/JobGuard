@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
+import { createUuid } from "@/lib/uuid";
 
 interface Citation {
   law: string;
@@ -41,7 +42,7 @@ export default function LawChatPage() {
     if (!question || loading) return;
 
     const userMessage: ChatMessage = {
-      id: crypto.randomUUID(),
+      id: createUuid(),
       role: "user",
       content: question,
     };
@@ -63,7 +64,7 @@ export default function LawChatPage() {
       }
 
       const assistantMessage: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: createUuid(),
         role: "assistant",
         content: data.answer ?? "未返回答案",
         citations: data.citations ?? [],
@@ -74,7 +75,7 @@ export default function LawChatPage() {
       setMessages((prev) => [
         ...prev,
         {
-          id: crypto.randomUUID(),
+          id: createUuid(),
           role: "assistant",
           content:
             (err as Error)?.message || "系统暂时不可用，请稍后再试。",

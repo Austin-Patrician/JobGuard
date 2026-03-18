@@ -14,6 +14,7 @@ import AnalysisLoadingState from "@/components/toolkit/AnalysisLoadingState";
 import ResultShareCard from "@/components/toolkit/ResultShareCard";
 import { useToolkitStore } from "@/stores";
 import { API_ROUTES } from "@/lib/constants";
+import { createUuid } from "@/lib/uuid";
 import type { ContractResult } from "@/types/toolkit";
 
 function fileToBase64(file: File): Promise<string> {
@@ -156,7 +157,7 @@ export default function ContractPage() {
       if (finalResult) {
         setContractResult(finalResult);
         addHistory({
-          id: crypto.randomUUID(),
+          id: createUuid(),
           tool: "contract",
           timestamp: Date.now(),
           inputPreview: mode === "text" ? text.slice(0, 100) : `[${files.length}页合同图片]`,

@@ -14,6 +14,7 @@ import AnalysisLoadingState from "@/components/toolkit/AnalysisLoadingState";
 import ResultShareCard from "@/components/toolkit/ResultShareCard";
 import { useToolkitStore } from "@/stores";
 import { API_ROUTES } from "@/lib/constants";
+import { createUuid } from "@/lib/uuid";
 import type { MirrorResult } from "@/types/toolkit";
 
 const EXAMPLE_TEXTS = [
@@ -158,7 +159,7 @@ export default function MirrorPage() {
       if (finalResult) {
         setMirrorResult(finalResult);
         addHistory({
-          id: crypto.randomUUID(),
+          id: createUuid(),
           tool: "mirror",
           timestamp: Date.now(),
           inputPreview: mode === "text" ? text.slice(0, 100) : "[图片分析]",
