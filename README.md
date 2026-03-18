@@ -247,3 +247,5 @@ JobGuard 实施了多层安全防护：
 **如果这个项目对你有帮助，请给一个 Star 支持一下！**
 
 </div>
+
+本项目已经加入LINUX DO开源社区 : [LINUX DO](https://linux.do/) 
