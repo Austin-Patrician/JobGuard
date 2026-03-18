@@ -20,6 +20,7 @@ NO_DB=false
 DOMAIN="${DOMAIN:-}"
 APP_BIND_IP="${APP_BIND_IP:-}"
 PUBLIC_URL_SCHEME="${PUBLIC_URL_SCHEME:-}"
+PROXY_MODE="${PROXY_MODE:-}"
 PROXY_HTTP_PORT="${PROXY_HTTP_PORT:-}"
 
 while [[ $# -gt 0 ]]; do
@@ -35,6 +36,15 @@ while [[ $# -gt 0 ]]; do
     --domain)
       [ $# -ge 2 ] || error "--domain 需要提供域名"
       DOMAIN="$2"
+      shift 2
+      ;;
+    --external-proxy)
+      PROXY_MODE="external"
+      shift
+      ;;
+    --proxy-http-port)
+      [ $# -ge 2 ] || error "--proxy-http-port 需要提供端口"
+      PROXY_HTTP_PORT="$2"
       shift 2
       ;;
     *)
@@ -79,14 +89,18 @@ if [ -z "${PORT:-}" ]; then
 fi
 PORT="${PORT:-3000}"
 PUBLIC_URL_SCHEME="${PUBLIC_URL_SCHEME:-https}"
+PROXY_MODE="${PROXY_MODE:-container}"
 info "应用端口: $PORT"
 
 if [ -n "$DOMAIN" ]; then
   NEXT_PUBLIC_APP_URL="${PUBLIC_URL_SCHEME}://${DOMAIN}"
   APP_BIND_IP="${APP_BIND_IP:-127.0.0.1}"
-  PROXY_HTTP_PORT="${PROXY_HTTP_PORT:-80}"
+  if [ "$PROXY_MODE" = "container" ]; then
+    PROXY_HTTP_PORT="${PROXY_HTTP_PORT:-80}"
+  fi
   info "启用域名反向代理: ${DOMAIN}"
   info "外部访问地址将使用: ${NEXT_PUBLIC_APP_URL}"
+  info "反向代理模式: ${PROXY_MODE}"
 else
   APP_BIND_IP="${APP_BIND_IP:-0.0.0.0}"
 fi
@@ -127,11 +141,11 @@ SERVICES=("jobguard")
 if [ "$NO_DB" = false ]; then
   SERVICES=("postgres" "jobguard")
 fi
-if [ -n "$DOMAIN" ]; then
+if [ -n "$DOMAIN" ] && [ "$PROXY_MODE" = "container" ]; then
   SERVICES+=("nginx")
 fi
 
-if [ -n "$DOMAIN" ]; then
+if [ -n "$DOMAIN" ] && [ "$PROXY_MODE" = "container" ]; then
   prepare_proxy_config
 fi
 
@@ -163,7 +177,7 @@ $DC up -d "${SERVICES[@]}"
 if [ "$NO_DB" = true ]; then
   $DC stop postgres >/dev/null 2>&1 || true
 fi
-if [ -z "$DOMAIN" ]; then
+if [ -z "$DOMAIN" ] || [ "$PROXY_MODE" != "container" ]; then
   $DC stop nginx >/dev/null 2>&1 || true
 fi
 
@@ -173,8 +187,10 @@ sleep 3
 
 HEALTHCHECK_URL="http://localhost:${PORT}/api/health"
 DISPLAY_URL="http://localhost:${PORT}"
-if [ -n "$DOMAIN" ]; then
+if [ -n "$DOMAIN" ] && [ "$PROXY_MODE" = "container" ]; then
   HEALTHCHECK_URL="http://localhost:${PROXY_HTTP_PORT}/api/health"
+  DISPLAY_URL="${NEXT_PUBLIC_APP_URL}"
+elif [ -n "$DOMAIN" ]; then
   DISPLAY_URL="${NEXT_PUBLIC_APP_URL}"
 fi
 
@@ -184,10 +200,12 @@ for i in $(seq 1 15); do
     info "============================================"
     info "  JobGuard 部署成功!"
     info "  访问地址: ${DISPLAY_URL}"
-    if [ -n "$DOMAIN" ]; then
+    if [ -n "$DOMAIN" ] && [ "$PROXY_MODE" = "container" ]; then
       info "  源站入口: http://${DOMAIN}:${PROXY_HTTP_PORT}"
       warn "Cloudflare 橙色云模式下，请使用 80/443，不要继续访问 :${PORT}"
       warn "若源站未配置证书，请在 Cloudflare SSL/TLS 中使用 Flexible"
+    elif [ -n "$DOMAIN" ]; then
+      warn "当前未启动容器内 Nginx，请让宿主机 Nginx/Caddy 反向代理到 127.0.0.1:${PORT}"
     fi
     info "============================================"
     exit 0
