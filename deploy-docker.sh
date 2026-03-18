@@ -56,6 +56,13 @@ if [ "${OPENAI_API_KEY:-}" = "your-openai-key" ] || [ -z "${OPENAI_API_KEY:-}" ]
   warn "OPENAI_API_KEY 未配置，AI 功能将不可用"
 fi
 
+# 解析端口：优先 PORT 变量，其次从 NEXT_PUBLIC_APP_URL 提取，默认 3000
+if [ -z "${PORT:-}" ]; then
+  PORT=$(echo "${NEXT_PUBLIC_APP_URL:-}" | grep -oP ':\K[0-9]+$' || echo "3000")
+fi
+PORT="${PORT:-3000}"
+info "使用端口: $PORT"
+
 # ── 构建 & 启动 ──────────────────────────────────────────────────────────────
 if command -v docker compose >/dev/null 2>&1; then
   DC="docker compose"
@@ -79,7 +86,9 @@ if [ "$NO_DB" = true ]; then
       --restart unless-stopped \
       --env-file .env \
       -e NODE_ENV=production \
-      -p "${PORT:-3000}:3000" \
+      -e PORT="${PORT}" \
+      -e HOSTNAME=0.0.0.0 \
+      -p "${PORT}:${PORT}" \
       jobguard:latest
   fi
 else
@@ -99,7 +108,6 @@ fi
 info "等待服务启动..."
 sleep 3
 
-PORT="${PORT:-3000}"
 for i in $(seq 1 15); do
   if curl -sf "http://localhost:${PORT}/api/health" >/dev/null 2>&1; then
     echo ""
