@@ -25,14 +25,27 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const reportFields = `
+      id,
+      sanitized_content,
+      summary,
+      tags,
+      region,
+      city,
+      industry,
+      scam_type,
+      upvotes,
+      view_count,
+      created_at
+    `;
     const selectSql = `
-      SELECT id, sanitized_content, summary, tags, region, city, industry, scam_type, upvotes, view_count, created_at
+      SELECT ${reportFields}
       FROM community_reports
       WHERE id = $1 AND status = 'approved'
       LIMIT 1
     `;
-    const { rows } = await dbQuery(selectSql, [id]);
-    const data = rows[0];
+    const { rows } = await dbQuery<Record<string, unknown>>(selectSql, [id]);
+    let data = rows[0];
 
     if (!data) {
       return NextResponse.json({ error: "Report not found" }, { status: 404 });
@@ -42,10 +55,17 @@ export async function GET(
     const ip = getClientIp(_request);
     const { limit: vcLimit, windowMs: vcWindow } = RATE_LIMIT_CONFIG.VIEW_COUNT;
     if (checkRateLimit(`view:${id}:${ip}`, vcLimit, vcWindow)) {
-      await dbQuery(
-        "UPDATE community_reports SET view_count = view_count + 1 WHERE id = $1",
+      const updateSql = `
+        UPDATE community_reports
+        SET view_count = view_count + 1
+        WHERE id = $1
+        RETURNING ${reportFields}
+      `;
+      const { rows: updatedRows } = await dbQuery<Record<string, unknown>>(
+        updateSql,
         [id]
       );
+      data = updatedRows[0] ?? data;
     }
 
     return NextResponse.json({

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
@@ -28,6 +29,42 @@ interface ReportCardProps {
 
 export default function ReportCard({ report, index }: ReportCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [canExpand, setCanExpand] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const measureOverflow = useCallback(() => {
+    const element = contentRef.current;
+    if (!element) {
+      setCanExpand(false);
+      return;
+    }
+
+    setCanExpand(element.scrollHeight - element.clientHeight > 1);
+  }, []);
+
+  useEffect(() => {
+    if (expanded) return;
+
+    const frame = requestAnimationFrame(measureOverflow);
+    const resizeObserver = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(() => {
+          measureOverflow();
+        })
+      : null;
+
+    const element = contentRef.current;
+    if (resizeObserver && element) {
+      resizeObserver.observe(element);
+    }
+
+    window.addEventListener("resize", measureOverflow);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", measureOverflow);
+    };
+  }, [expanded, measureOverflow, report.sanitized_content]);
 
   return (
     <motion.div
@@ -58,6 +95,7 @@ export default function ReportCard({ report, index }: ReportCardProps) {
 
       {/* Content */}
       <div
+        ref={contentRef}
         className={`mt-2 text-sm leading-relaxed text-[color:var(--muted-ink)] ${
           !expanded ? "line-clamp-3" : ""
         }`}
@@ -71,7 +109,7 @@ export default function ReportCard({ report, index }: ReportCardProps) {
           {report.sanitized_content}
         </ReactMarkdown>
       </div>
-      {report.sanitized_content.length > 200 && (
+      {(canExpand || expanded) && (
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
@@ -98,6 +136,12 @@ export default function ReportCard({ report, index }: ReportCardProps) {
         <span className="text-xs text-[color:var(--muted-ink)]">
           {report.view_count} 次查看
         </span>
+        <Link
+          href={`/community/${report.id}`}
+          className="ml-auto inline-flex items-center rounded-full border border-[color:var(--paper-edge)] px-3 py-1.5 text-xs font-semibold text-[color:var(--ink)] transition hover:-translate-y-0.5 hover:bg-white"
+        >
+          查看详情
+        </Link>
       </div>
     </motion.div>
   );

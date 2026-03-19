@@ -108,7 +108,10 @@ export default function LawChatPage() {
               用轻松的方式解释劳动法规，帮你把“话术”翻译成“规则”。
             </p>
           </div>
-          <Link href="/dashboard" className="text-xs font-semibold text-[#6b7280]">
+          <Link
+            href="/dashboard"
+            className="text-xs font-semibold text-[color:var(--accent)]"
+          >
             返回首页
           </Link>
         </header>
