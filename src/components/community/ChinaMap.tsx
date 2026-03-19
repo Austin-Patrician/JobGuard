@@ -6,7 +6,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useCommunityStore } from "@/stores";
 import type { RegionStat } from "@/types/community";
 import { toShortName } from "@/data/region-name-map";
-import { createBaseStyle, LIGHT_COLORS, DARK_COLORS } from "@/lib/map-style";
+import { createBaseStyle, LIGHT_COLORS } from "@/lib/map-style";
 
 const INITIAL_VIEW = {
   longitude: 104.5,
@@ -93,15 +93,6 @@ export default function ChinaMap({ regions }: ChinaMapProps) {
   } | null>(null);
   const [geoData, setGeoData] =
     useState<GeoJSON.FeatureCollection | null>(null);
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    setIsDark(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
 
   const regionLookup = useMemo(() => {
     const m = new Map<string, RegionStat>();
@@ -209,8 +200,8 @@ export default function ChinaMap({ regions }: ChinaMapProps) {
   );
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
-  const baseStyle = useMemo(() => createBaseStyle(isDark), [isDark]);
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  const baseStyle = useMemo(() => createBaseStyle(false), []);
+  const colors = LIGHT_COLORS;
 
   const fillPaint: Record<string, unknown> = useMemo(
     () => ({
@@ -233,29 +224,25 @@ export default function ChinaMap({ regions }: ChinaMapProps) {
 
   const borderPaint: Record<string, unknown> = useMemo(
     () => ({
-      "line-color": isDark
-        ? "rgba(255, 255, 255, 0.15)"
-        : "rgba(100, 100, 100, 0.3)",
+      "line-color": "rgba(100, 100, 100, 0.3)",
       "line-width": 0.5,
     }),
-    [isDark],
+    [],
   );
 
   const hoverPaint: Record<string, unknown> = useMemo(
     () => ({
-      "fill-color": isDark
-        ? "rgba(255, 255, 255, 0.12)"
-        : "rgba(255, 255, 255, 0.25)",
+      "fill-color": "rgba(255, 255, 255, 0.25)",
     }),
-    [isDark],
+    [],
   );
 
   const selectedBorderPaint: Record<string, unknown> = useMemo(
     () => ({
-      "line-color": isDark ? "#e85a5a" : "#b32b2b",
+      "line-color": "#b32b2b",
       "line-width": 2.5,
     }),
-    [isDark],
+    [],
   );
 
   return (

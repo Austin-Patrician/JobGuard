@@ -15,21 +15,8 @@
   --success: #2e7d5d;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #16130f;
-    --foreground: #f2e9db;
-    --paper: #221d17;
-    --paper-shadow: rgba(0, 0, 0, 0.55);
-    --paper-edge: rgba(255, 255, 255, 0.08);
-    --desk: #1b1712;
-    --ink: #f2e9db;
-    --muted-ink: rgba(242, 233, 219, 0.7);
-    --accent: #e85a5a;
-    --accent-soft: rgba(232, 90, 90, 0.2);
-    --warn: #f1b24a;
-    --success: #62b08d;
-  }
+html {
+  color-scheme: light;
 }
 
 body {

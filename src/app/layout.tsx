@@ -30,9 +30,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" style={{ colorScheme: "light" }}>
       <body
-        className={`${sansFont.className} ${displayFont.variable} ${sansFont.variable} antialiased min-h-screen`}
+        className={`${sansFont.className} ${displayFont.variable} ${sansFont.variable} min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)] antialiased`}
       >
         {children}
       </body>
