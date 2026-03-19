@@ -40,13 +40,13 @@ export default function ToolkitHubPage() {
 
   return (
     <div className="min-h-screen story-surface text-[color:var(--ink)]">
-      <div className="mx-auto max-w-6xl px-4 py-12">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:py-12">
         <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-3">
             <p className="text-xs uppercase tracking-[0.32em] text-[color:var(--muted-ink)]">
               JobGuard · Toolkit
             </p>
-            <h1 className="font-display text-4xl sm:text-5xl">
+            <h1 className="font-display text-3xl sm:text-5xl">
               实用防御工具箱
             </h1>
             <p className="text-sm text-[color:var(--muted-ink)]">
@@ -82,7 +82,7 @@ export default function ToolkitHubPage() {
 
         {history.length > 0 && (
           <section className="mt-12">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="font-display text-2xl">最近分析</h2>
               <p className="text-xs text-[color:var(--muted-ink)]">
                 最近 {history.length} 条记录
@@ -104,7 +104,7 @@ export default function ToolkitHubPage() {
                       isStale ? "opacity-80" : "hover:-translate-y-0.5"
                     )}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <div
                         className={clsx(
                           "h-2.5 w-2.5 rounded-full",
@@ -125,7 +125,7 @@ export default function ToolkitHubPage() {
                       <span className="text-[10px] text-[color:var(--muted-ink)]">
                         评分 {record.score}
                       </span>
-                      <span className="ml-auto text-[10px] text-[color:var(--muted-ink)]">
+                      <span className="w-full text-[10px] text-[color:var(--muted-ink)] sm:ml-auto sm:w-auto">
                         {new Date(record.timestamp).toLocaleDateString(
                           "zh-CN",
                           {

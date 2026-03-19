@@ -80,7 +80,7 @@ export default function SubmitForm() {
         <div className="pointer-events-none absolute inset-0 grain-overlay opacity-40" />
       )}
 
-      <div className="relative mx-auto max-w-3xl px-4 py-12">
+      <div className="relative mx-auto max-w-3xl px-4 py-10 sm:py-12">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-3">
             <p
@@ -91,7 +91,7 @@ export default function SubmitForm() {
             >
               Community Intel
             </p>
-            <h1 className="font-display text-4xl sm:text-5xl">提交情报</h1>
+            <h1 className="font-display text-3xl sm:text-5xl">提交情报</h1>
             <p
               className={clsx(
                 "text-sm",
@@ -121,7 +121,7 @@ export default function SubmitForm() {
               exit={{ opacity: 0, y: -20 }}
               className="mt-10"
             >
-              <div className="paper-card mx-auto p-6 sm:p-8">
+              <div className="paper-card mx-auto p-5 sm:p-8">
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
@@ -129,7 +129,7 @@ export default function SubmitForm() {
                   rows={12}
                   className="w-full resize-none rounded-xl border border-[color:var(--paper-edge)] bg-transparent px-4 py-3 text-sm leading-relaxed text-[color:var(--ink)] placeholder:text-[color:var(--muted-ink)] focus:border-[color:var(--accent)] focus:outline-none focus:ring-1 focus:ring-[color:var(--accent)]"
                 />
-                <div className="mt-2 flex items-center justify-between">
+                <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-xs text-[color:var(--muted-ink)]">
                     支持 Markdown 格式
                   </p>
@@ -236,10 +236,10 @@ export default function SubmitForm() {
                     </div>
                   )}
 
-                  <div className="mt-6 flex gap-3">
+                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                     <Link
                       href="/community"
-                      className="rounded-full bg-[color:var(--accent)] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                      className="inline-flex items-center justify-center rounded-full bg-[color:var(--accent)] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
                     >
                       查看情报局
                     </Link>

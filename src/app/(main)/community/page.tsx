@@ -42,7 +42,7 @@ export default function CommunityPage() {
       <div className="pointer-events-none absolute inset-0 grain-overlay opacity-20" />
 
       {/* Header: Title + Stats */}
-      <section className="relative mx-auto max-w-6xl px-4 pt-12 pb-8">
+      <section className="relative mx-auto max-w-6xl px-4 pt-10 pb-8 sm:pt-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -52,21 +52,21 @@ export default function CommunityPage() {
             <p className="text-xs uppercase tracking-[0.32em] text-[color:var(--muted-ink)]">
               Module 3
             </p>
-            <h1 className="font-display text-4xl sm:text-5xl">避坑情报局</h1>
+            <h1 className="font-display text-3xl sm:text-5xl">避坑情报局</h1>
             <p className="max-w-lg text-sm text-[color:var(--muted-ink)]">
               匿名分享求职踩坑经历，AI 自动脱敏保护隐私。查看全国避坑热力图。
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
             <Link
               href="/community/submit"
-              className="inline-block rounded-full bg-[color:var(--accent)] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(179,43,43,0.3)] transition hover:-translate-y-0.5"
+              className="inline-flex w-full items-center justify-center rounded-full bg-[color:var(--accent)] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(179,43,43,0.3)] transition hover:-translate-y-0.5 sm:w-auto"
             >
               提交情报
             </Link>
             <Link
               href="/"
-              className="inline-block rounded-full border border-[color:var(--paper-edge)] bg-white/70 px-5 py-2.5 text-sm font-semibold text-[color:var(--ink)] transition hover:-translate-y-0.5 hover:bg-white"
+              className="inline-flex w-full items-center justify-center rounded-full border border-[color:var(--paper-edge)] bg-white/70 px-5 py-2.5 text-sm font-semibold text-[color:var(--ink)] transition hover:-translate-y-0.5 hover:bg-white sm:w-auto"
             >
               返回首页
             </Link>
@@ -133,10 +133,10 @@ export default function CommunityPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="paper-card relative overflow-hidden h-[520px]"
+          className="paper-card relative h-[320px] overflow-hidden sm:h-[420px] lg:h-[520px]"
         >
           <ChinaMap regions={stats?.regions ?? []} />
-          <div className="absolute bottom-3 right-3 z-10">
+          <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 sm:left-auto sm:right-3 sm:translate-x-0">
             <MapLegend />
           </div>
         </motion.div>

@@ -81,7 +81,7 @@ export default function ReportCard({ report, index }: ReportCardProps) {
         {report.industry && (
           <span className="tag-chip">{report.industry}</span>
         )}
-        <span className="ml-auto text-xs text-[color:var(--muted-ink)]">
+        <span className="w-full text-xs text-[color:var(--muted-ink)] sm:ml-auto sm:w-auto sm:text-right">
           {timeAgo(report.created_at)}
         </span>
       </div>
@@ -131,14 +131,14 @@ export default function ReportCard({ report, index }: ReportCardProps) {
       )}
 
       {/* Footer */}
-      <div className="mt-3 flex items-center gap-3 border-t border-[color:var(--paper-edge)] pt-3">
+      <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-[color:var(--paper-edge)] pt-3">
         <VoteButton reportId={report.id} initialUpvotes={report.upvotes} />
         <span className="text-xs text-[color:var(--muted-ink)]">
           {report.view_count} 次查看
         </span>
         <Link
           href={`/community/${report.id}`}
-          className="ml-auto inline-flex items-center rounded-full border border-[color:var(--paper-edge)] px-3 py-1.5 text-xs font-semibold text-[color:var(--ink)] transition hover:-translate-y-0.5 hover:bg-white"
+          className="inline-flex w-full items-center justify-center rounded-full border border-[color:var(--paper-edge)] px-3 py-1.5 text-xs font-semibold text-[color:var(--ink)] transition hover:-translate-y-0.5 hover:bg-white sm:ml-auto sm:w-auto"
         >
           查看详情
         </Link>

@@ -95,7 +95,7 @@ export default function CommunityReportDetailPage() {
     <div className="min-h-screen intel-surface text-[color:var(--ink)]">
       <div className="pointer-events-none absolute inset-0 grain-overlay opacity-20" />
 
-      <section className="relative mx-auto max-w-4xl px-4 pt-12 pb-16">
+      <section className="relative mx-auto max-w-4xl px-4 pt-10 pb-16 sm:pt-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -105,7 +105,7 @@ export default function CommunityReportDetailPage() {
             <p className="text-xs uppercase tracking-[0.32em] text-[color:var(--muted-ink)]">
               Intelligence Archive
             </p>
-            <h1 className="font-display text-4xl sm:text-5xl">情报详情</h1>
+            <h1 className="font-display text-3xl sm:text-5xl">情报详情</h1>
             <p className="max-w-2xl text-sm text-[color:var(--muted-ink)]">
               浏览完整情报正文，查看发布时间、标签、浏览量和社区支持情况。
             </p>
@@ -148,7 +148,7 @@ export default function CommunityReportDetailPage() {
             animate={{ opacity: 1, y: 0 }}
             className="paper-card overflow-hidden p-0"
           >
-            <div className="border-b border-[color:var(--paper-edge)] bg-white/75 px-6 py-6 sm:px-8">
+            <div className="border-b border-[color:var(--paper-edge)] bg-white/75 px-5 py-5 sm:px-8 sm:py-6">
               <div className="flex flex-wrap items-center gap-2">
                 {report.region && (
                   <span className="tag-chip">{report.region}</span>
@@ -159,13 +159,13 @@ export default function CommunityReportDetailPage() {
                 {report.city && (
                   <span className="tag-chip">{report.city}</span>
                 )}
-                <span className="ml-auto text-xs text-[color:var(--muted-ink)]">
+                <span className="w-full text-xs text-[color:var(--muted-ink)] sm:ml-auto sm:w-auto sm:text-right">
                   {timeAgo(report.created_at)}
                 </span>
               </div>
 
               {report.summary && (
-                <h2 className="mt-5 max-w-3xl font-display text-3xl leading-tight text-[color:var(--ink)] sm:text-4xl">
+                <h2 className="mt-5 max-w-3xl font-display text-2xl leading-tight text-[color:var(--ink)] sm:text-4xl">
                   {report.summary}
                 </h2>
               )}
@@ -198,7 +198,7 @@ export default function CommunityReportDetailPage() {
               </div>
             </div>
 
-            <div className="px-6 py-6 sm:px-8 sm:py-8">
+            <div className="px-5 py-5 sm:px-8 sm:py-8">
               {report.tags.length > 0 && (
                 <div className="mb-6 flex flex-wrap gap-2">
                   {report.tags.map((tag) => (
@@ -213,10 +213,10 @@ export default function CommunityReportDetailPage() {
                 <ReactMarkdown
                   rehypePlugins={[rehypeSanitize]}
                   components={{
-                    p: ({ children }) => <p className="mb-4 text-base leading-8">{children}</p>,
+                    p: ({ children }) => <p className="mb-4 text-sm leading-7 sm:text-base sm:leading-8">{children}</p>,
                     ul: ({ children }) => <ul className="mb-4 list-disc space-y-2 pl-5">{children}</ul>,
                     ol: ({ children }) => <ol className="mb-4 list-decimal space-y-2 pl-5">{children}</ol>,
-                    li: ({ children }) => <li className="text-base leading-8">{children}</li>,
+                    li: ({ children }) => <li className="text-sm leading-7 sm:text-base sm:leading-8">{children}</li>,
                     strong: ({ children }) => <strong className="font-semibold text-[color:var(--ink)]">{children}</strong>,
                   }}
                 >

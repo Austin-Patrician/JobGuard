@@ -545,6 +545,45 @@ body {
     cursor: not-allowed;
   }
 
+  @media (max-width: 639px) {
+    .lawchat-shell {
+      width: 100%;
+      min-height: 0;
+      height: min(72vh, 620px);
+      border-radius: 18px;
+    }
+
+    .lawchat-body {
+      padding: 14px 14px 16px;
+    }
+
+    .lawchat-bubble {
+      max-width: 88%;
+      padding: 9px 12px;
+      font-size: 13px;
+    }
+
+    .lawchat-citations {
+      max-width: 88%;
+    }
+
+    .lawchat-input {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      padding: 10px 12px 12px;
+    }
+
+    .lawchat-textarea {
+      min-height: 88px;
+      max-height: 160px;
+    }
+
+    .lawchat-send {
+      width: 100%;
+    }
+  }
+
   .typing-dot {
     animation: typing-bounce 1.4s infinite ease-in-out;
   }

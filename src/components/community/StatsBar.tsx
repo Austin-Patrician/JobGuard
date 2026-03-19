@@ -36,22 +36,22 @@ export default function StatsBar({ totalReports, activeRegions, topScamType }: S
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="glass-panel rounded-2xl px-6 py-4"
+      className="glass-panel rounded-2xl px-4 py-3 sm:px-6 sm:py-4"
     >
-      <div className="grid grid-cols-3 divide-x divide-[color:var(--paper-edge)]">
-        <div className="pr-4 text-center">
+      <div className="grid grid-cols-1 divide-y divide-[color:var(--paper-edge)] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <div className="py-3 text-center first:pt-0 sm:py-0 sm:pr-4">
           <p className="font-display text-2xl text-[color:var(--ink)]">
             <AnimatedNumber target={totalReports} />
           </p>
           <p className="mt-1 text-xs text-[color:var(--muted-ink)]">情报总数</p>
         </div>
-        <div className="px-4 text-center">
+        <div className="py-3 text-center sm:px-4 sm:py-0">
           <p className="font-display text-2xl text-[color:var(--ink)]">
             <AnimatedNumber target={activeRegions} />
           </p>
           <p className="mt-1 text-xs text-[color:var(--muted-ink)]">覆盖地区</p>
         </div>
-        <div className="pl-4 text-center">
+        <div className="py-3 text-center last:pb-0 sm:py-0 sm:pl-4">
           <p className="font-display text-lg text-[color:var(--accent)]">
             {topScamType || "--"}
           </p>

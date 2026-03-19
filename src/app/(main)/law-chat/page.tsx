@@ -90,12 +90,12 @@ export default function LawChatPage() {
     <div className="relative min-h-screen overflow-hidden story-surface text-[color:var(--ink)]">
 
       <div className="pointer-events-none absolute inset-0">
-        <div className="law-bubble float-bob absolute left-6 top-10 h-20 w-20 rounded-full opacity-70" />
-        <div className="law-bubble float-bob-delayed absolute right-10 top-32 h-24 w-24 rounded-full opacity-60" />
-        <div className="law-bubble float-bob absolute left-16 bottom-24 h-16 w-16 rounded-full opacity-50" />
+        <div className="law-bubble float-bob absolute left-4 top-6 hidden h-14 w-14 rounded-full opacity-60 sm:block sm:left-6 sm:top-10 sm:h-20 sm:w-20 sm:opacity-70" />
+        <div className="law-bubble float-bob-delayed absolute right-4 top-20 hidden h-16 w-16 rounded-full opacity-50 sm:block sm:right-10 sm:top-32 sm:h-24 sm:w-24 sm:opacity-60" />
+        <div className="law-bubble float-bob absolute bottom-20 left-8 hidden h-12 w-12 rounded-full opacity-40 sm:block sm:left-16 sm:bottom-24 sm:h-16 sm:w-16 sm:opacity-50" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:py-16">
+      <div className="relative z-10 mx-auto max-w-4xl px-4 py-10 sm:py-16">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -103,7 +103,7 @@ export default function LawChatPage() {
               <span className="law-chip">引用法条</span>
               <span className="law-chip">温柔答疑</span>
             </div>
-            <h1 className="font-display text-4xl sm:text-5xl">法聊小屋</h1>
+            <h1 className="font-display text-3xl sm:text-5xl">法聊小屋</h1>
             <p className="text-sm text-[color:var(--muted-ink)]">
               用轻松的方式解释劳动法规，帮你把“话术”翻译成“规则”。
             </p>
@@ -116,7 +116,7 @@ export default function LawChatPage() {
           </Link>
         </header>
 
-        <div className="mt-10 flex justify-center">
+        <div className="mt-8 flex justify-center sm:mt-10">
           <div className="lawchat-shell">
             <div ref={chatBodyRef} className="lawchat-body space-y-3">
               {messages.map((msg) => (
@@ -200,7 +200,7 @@ export default function LawChatPage() {
           </div>
         </div>
 
-        <p className="mt-6 text-xs text-[color:var(--muted-ink)]">
+        <p className="mt-5 text-xs text-[color:var(--muted-ink)] sm:mt-6">
           回答仅供参考，涉及争议请咨询专业律师或主管部门。
         </p>
       </div>

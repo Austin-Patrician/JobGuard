@@ -5,15 +5,15 @@ export default function DashboardPage() {
         <div className="pointer-events-none absolute inset-0 story-halo" />
         <div className="pointer-events-none absolute inset-0 grain-overlay opacity-30" />
 
-        <section className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16">
-          <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+        <section className="relative mx-auto max-w-6xl px-4 py-10 sm:py-16">
+          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-10">
             <div className="space-y-5">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="story-chip">叙事解谜</span>
                 <span className="story-chip">求职防坑</span>
                 <span className="story-chip">夜间开场</span>
               </div>
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl">
+              <h1 className="font-display text-3xl leading-tight sm:text-5xl lg:text-6xl">
                 不是每一次“机会”
                 <br />
                 都是通往未来的门
@@ -21,16 +21,16 @@ export default function DashboardPage() {
               <p className="max-w-xl text-sm leading-relaxed text-[color:var(--muted-ink)] sm:text-base">
                 你将进入一个被话术与合同包围的职场迷宫。识破陷阱、保护权益、一步步升级你的防坑直觉。
               </p>
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                 <a
                   href="#modules"
-                  className="rounded-full bg-[color:var(--accent)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(179,43,43,0.3)] transition hover:-translate-y-0.5"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-[color:var(--accent)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(179,43,43,0.3)] transition hover:-translate-y-0.5 sm:w-auto"
                 >
                   了解模块
                 </a>
                 <a
                   href="/game"
-                  className="rounded-full border border-black/10 px-5 py-3 text-sm font-semibold text-[color:var(--ink)] transition hover:bg-white"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-semibold text-[color:var(--ink)] transition hover:bg-white sm:w-auto"
                 >
                   开始闯关
                 </a>
@@ -38,9 +38,9 @@ export default function DashboardPage() {
             </div>
 
             <div className="relative mx-auto w-full max-w-sm">
-              <div className="story-orb absolute -right-10 top-10 h-24 w-24 rounded-full opacity-60" />
-              <div className="story-orb absolute -left-6 bottom-8 h-16 w-16 rounded-full opacity-50" />
-              <div className="paper-card relative p-6">
+              <div className="story-orb absolute -right-4 top-6 hidden h-16 w-16 rounded-full opacity-60 sm:block lg:-right-10 lg:top-10 lg:h-24 lg:w-24" />
+              <div className="story-orb absolute -left-2 bottom-4 hidden h-12 w-12 rounded-full opacity-50 sm:block lg:-left-6 lg:bottom-8 lg:h-16 lg:w-16" />
+              <div className="paper-card relative p-5 sm:p-6">
                 <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted-ink)]">
                   叙事场景
                 </p>
@@ -129,8 +129,8 @@ export default function DashboardPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pb-16">
-        <div className="story-card px-6 py-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="story-card px-5 py-5 sm:px-6 sm:py-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted-ink)]">
                 劳动法资讯
@@ -141,7 +141,7 @@ export default function DashboardPage() {
             </div>
             <a
               href="/law-chat"
-              className="rounded-full bg-[color:var(--accent)] px-5 py-2 text-xs font-semibold text-white shadow-[0_12px_26px_rgba(179,43,43,0.22)] transition hover:-translate-y-0.5"
+              className="inline-flex w-full items-center justify-center rounded-full bg-[color:var(--accent)] px-5 py-2 text-xs font-semibold text-white shadow-[0_12px_26px_rgba(179,43,43,0.22)] transition hover:-translate-y-0.5 sm:w-auto"
             >
               进入法聊小屋
             </a>

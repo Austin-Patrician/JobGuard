@@ -60,26 +60,28 @@ export default function ReportFeed() {
   return (
     <div>
       {/* Filters */}
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        {selectedRegion && (
-          <button
-            type="button"
-            onClick={() => setSelectedRegion(null)}
-            className="tag-chip !bg-[color:var(--accent-soft)] !text-[color:var(--accent)]"
-          >
-            {selectedRegion} &times;
-          </button>
-        )}
-        {selectedTag && (
-          <button
-            type="button"
-            onClick={() => setSelectedTag(null)}
-            className="tag-chip !bg-[color:var(--accent-soft)] !text-[color:var(--accent)]"
-          >
-            {selectedTag} &times;
-          </button>
-        )}
-        <div className="ml-auto flex gap-2">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="flex flex-wrap gap-2">
+          {selectedRegion && (
+            <button
+              type="button"
+              onClick={() => setSelectedRegion(null)}
+              className="tag-chip !bg-[color:var(--accent-soft)] !text-[color:var(--accent)]"
+            >
+              {selectedRegion} &times;
+            </button>
+          )}
+          {selectedTag && (
+            <button
+              type="button"
+              onClick={() => setSelectedTag(null)}
+              className="tag-chip !bg-[color:var(--accent-soft)] !text-[color:var(--accent)]"
+            >
+              {selectedTag} &times;
+            </button>
+          )}
+        </div>
+        <div className="flex gap-2 self-start sm:ml-auto">
           <button
             type="button"
             onClick={() => setSortBy("newest")}
@@ -139,7 +141,7 @@ export default function ReportFeed() {
           <button
             type="button"
             onClick={loadMore}
-            className="rounded-full border border-[color:var(--paper-edge)] px-6 py-2.5 text-sm text-[color:var(--muted-ink)] transition hover:bg-white"
+            className="w-full rounded-full border border-[color:var(--paper-edge)] px-6 py-2.5 text-sm text-[color:var(--muted-ink)] transition hover:bg-white sm:w-auto"
           >
             加载更多
           </button>
