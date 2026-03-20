@@ -84,16 +84,18 @@ npm install
 
 ### 3) 配置环境变量
 
-复制 `.env` 模板并填入你的配置：
+复制 `.env.example` 模板并填入你的配置：
 
 ```bash
-cp .env .env.local
+cp .env.example .env
 ```
 
 ```env
 # App
+APP_DOMAIN=jobguard.example.com
+LETSENCRYPT_EMAIL=ops@example.com
 NEXT_PUBLIC_APP_NAME=JobGuard
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=https://jobguard.example.com
 
 # AI (OpenAI 兼容接口)
 OPENAI_API_KEY=your-api-key
@@ -101,8 +103,8 @@ OPENAI_API_BASE_URL=https://api.openai.com/v1
 AI_MODEL=gpt-4.1
 
 # Database
-DATABASE_URL=postgres://user:password@localhost:5432/jobguard
-PGSSLMODE=require
+DATABASE_URL=postgresql://jobguard:change-this-password@127.0.0.1:5432/jobguard
+# PGSSLMODE=require  # 仅云数据库或强制 SSL 时启用
 
 # Security
 IP_HASH_SALT=your-random-salt-string
@@ -155,6 +157,41 @@ npm run build && npm start
 ```
 
 访问 http://localhost:3000
+
+### 7) Linux 服务器部署（Nginx + systemd）
+
+适用于已经把域名解析到服务器公网 IP 的场景，例如：
+
+- `jobguard.20250230.xyz -> 你的香港服务器公网 IP`
+
+部署前请确认：
+
+- 服务器已开放 `80` 和 `443`
+- `.env` 中已填写 `APP_DOMAIN`、`LETSENCRYPT_EMAIL`、`DATABASE_URL`
+- 使用具备 `sudo` 权限的账号执行脚本
+
+执行部署：
+
+```bash
+bash deploy-linux.sh
+```
+
+脚本会自动完成这些步骤：
+
+- 检查并安装 Node.js / Nginx / Certbot（可用 `--skip-deps` 跳过）
+- 执行 `npm ci`、法条索引构建与 `next build`
+- 生成 `jobguard.service` 并通过 `systemd` 启动
+- 安装 Nginx 站点配置并反代到 `127.0.0.1:3000`
+- 通过 `certbot --nginx` 申请 HTTPS 证书
+- 最后校验 `https://你的域名/api/health`
+
+常用参数：
+
+```bash
+bash deploy-linux.sh --domain jobguard.20250230.xyz --email ops@example.com
+bash deploy-linux.sh --skip-deps
+bash deploy-linux.sh --skip-https
+```
 
 ## 项目结构
 
