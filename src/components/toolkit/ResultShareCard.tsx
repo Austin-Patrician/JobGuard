@@ -25,6 +25,28 @@ const riskColors: Record<RiskLevel, string> = {
   dangerous: "#b32b2b",
 };
 
+const toolLabels: Record<string, string> = {
+  mirror: "照妖镜",
+  contract: "合同避雷针",
+  resume: "简历优化器",
+};
+
+const toolMetricLabels: Record<string, { title: string; scoreLabel: string }> = {
+  mirror: { title: "风险评级", scoreLabel: "安全评分" },
+  contract: { title: "风险评级", scoreLabel: "安全评分" },
+  resume: { title: "匹配判断", scoreLabel: "匹配度" },
+};
+
+const toolStatusLabels: Record<string, Record<RiskLevel, string>> = {
+  mirror: riskLabels,
+  contract: riskLabels,
+  resume: {
+    safe: "高匹配",
+    suspicious: "待补强",
+    dangerous: "低匹配",
+  },
+};
+
 export default function ResultShareCard({
   score,
   riskLevel,
@@ -34,6 +56,8 @@ export default function ResultShareCard({
   const [showCard, setShowCard] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const metricLabels = toolMetricLabels[toolName] ?? toolMetricLabels.mirror;
+  const statusLabels = toolStatusLabels[toolName] ?? toolStatusLabels.mirror;
 
   const generateShare = useCallback(async () => {
     const qr = await QRCode.toDataURL(window.location.href, {
@@ -99,7 +123,7 @@ export default function ResultShareCard({
                     color: "rgba(27,27,27,0.68)",
                   }}
                 >
-                  JobGuard {toolName === "mirror" ? "照妖镜" : "合同避雷针"}
+                  JobGuard {toolLabels[toolName] ?? toolName}
                 </p>
                 <div
                   style={{
@@ -133,7 +157,7 @@ export default function ResultShareCard({
                         color: "#1b1b1b",
                       }}
                     >
-                      风险评级：{riskLabels[riskLevel]}
+                      {metricLabels.title}：{statusLabels[riskLevel]}
                     </p>
                     <p
                       style={{
@@ -142,7 +166,7 @@ export default function ResultShareCard({
                         marginTop: 2,
                       }}
                     >
-                      安全评分 {score}/100
+                      {metricLabels.scoreLabel} {score}/100
                     </p>
                   </div>
                 </div>

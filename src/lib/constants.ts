@@ -58,6 +58,7 @@ export const API_ROUTES = {
   TOOLKIT: {
     MIRROR: "/api/toolkit/mirror",
     CONTRACT: "/api/toolkit/contract",
+    RESUME: "/api/toolkit/resume",
   },
   COMMUNITY: {
     REPORTS: "/api/community/reports",
@@ -80,6 +81,7 @@ export const BODY_SIZE_LIMITS = {
   LAW_CHAT: 10 * 1024,          // 10KB
   MIRROR: 3 * 1024 * 1024,      // 3MB
   CONTRACT: 15 * 1024 * 1024,   // 15MB
+  RESUME: 10 * 1024 * 1024,     // 10MB
   COMMUNITY_REPORT: 10 * 1024,  // 10KB
   COMMUNITY_VOTE: 1024,         // 1KB
 } as const;
@@ -87,6 +89,10 @@ export const BODY_SIZE_LIMITS = {
 export const AI_INPUT_LIMITS = {
   LAW_CHAT_QUESTION: 2000,
   CONTRACT_TEXT: 50_000,
+  RESUME_TEXT: 25_000,
+  RESUME_JD: 8_000,
+  RESUME_PDF_BASE64: 7 * 1024 * 1024,
+  RESUME_PDF_PAGES: 8,
   IMAGE_SINGLE_BASE64: 2 * 1024 * 1024,  // 2MB base64 encoded
   IMAGE_TOTAL_BASE64: 10 * 1024 * 1024,  // 10MB total
 } as const;
@@ -95,6 +101,7 @@ export const AI_ENDPOINTS = [
   "/api/law-chat",
   "/api/toolkit/mirror",
   "/api/toolkit/contract",
+  "/api/toolkit/resume",
 ] as const;
 
 export const COMMUNITY_CONFIG = {

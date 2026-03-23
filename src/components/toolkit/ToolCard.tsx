@@ -9,7 +9,7 @@ interface ToolCardProps {
   description: string;
   icon: string;
   href: string;
-  accentColor: "red" | "amber";
+  accentColor: "red" | "amber" | "blue";
 }
 
 export default function ToolCard({
@@ -37,12 +37,14 @@ export default function ToolCard({
               "ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-xl sm:h-12 sm:w-12 sm:text-2xl",
               accentColor === "red"
                 ? "bg-[color:var(--accent-soft)] text-[color:var(--accent)]"
-                : "bg-amber-100 text-amber-600"
+                : accentColor === "amber"
+                  ? "bg-amber-100 text-amber-600"
+                  : "bg-sky-100 text-sky-700"
             )}
-        >
-          {icon}
+          >
+            {icon}
+          </div>
         </div>
-      </div>
         <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted-ink)]">
           {description}
         </p>
@@ -56,7 +58,9 @@ export default function ToolCard({
               "inline-flex self-start rounded-full px-3 py-1 text-xs font-semibold transition group-hover:opacity-90",
               accentColor === "red"
                 ? "bg-[color:var(--accent)] text-white"
-                : "bg-amber-500 text-white"
+                : accentColor === "amber"
+                  ? "bg-amber-500 text-white"
+                  : "bg-sky-600 text-white"
             )}
           >
             立即使用

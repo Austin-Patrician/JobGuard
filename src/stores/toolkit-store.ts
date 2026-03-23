@@ -12,15 +12,22 @@ export const useToolkitStore = create<ToolkitState & ToolkitActions>()(
       history: [],
       currentMirrorResult: null,
       currentContractResult: null,
+      currentResumeResult: null,
       isAnalyzing: false,
 
       setMirrorResult: (result) => set({ currentMirrorResult: result }),
       setContractResult: (result) => set({ currentContractResult: result }),
+      setResumeResult: (result) => set({ currentResumeResult: result }),
       setIsAnalyzing: (value) => set({ isAnalyzing: value }),
 
       addHistory: (record) =>
         set((state) => ({
           history: [record, ...state.history].slice(0, MAX_HISTORY),
+        })),
+
+      removeHistory: (id) =>
+        set((state) => ({
+          history: state.history.filter((record) => record.id !== id),
         })),
 
       clearHistory: () => set({ history: [] }),
